@@ -60,9 +60,8 @@ Licence URI: http://www.os-templates.com/template-terms
   <footer id="footer" class="hoc clear"> 
     <div class="content"> 
       <!-- ################################################################################################ -->
-      <h1> Blinking the Built-In LED</h1>
-      <img class="imgr borderedbox inspace-5" src="../images/demo/BlinkingInternal.gif" alt="">
-      <p>Used the blink default program on the arduino to blink the internal LED.</p>
+      <h1>Adding Hardware</h1>
+      <p>We added 2 light sensors in the front of the robot to detect if the robot has veered off the line and to detect intersections. We placed these about 2 inches apart in order to straddle the line. In addition we swapped out our oversized wheels for smaller, more stable ones. This improved the consistency of our motion but did mean we had to retune the cutoff value between black and white for the light sensor.</p>
       </div>
     <!-- ################################################################################################ -->
   </footer>
@@ -70,9 +69,10 @@ Licence URI: http://www.os-templates.com/template-terms
 <div class="wrapper row4">
   <footer id="footer" class="hoc clear"> 
     <div class="content">
-      <h1> Blinking An External LED</h1>
-      <img class="imgr borderedbox inspace-5" src="../images/demo/BlinkingExternal.gif" alt="">
-      <p>Attached the External LED with positive in pin 9 and negative in the ground. Ran same program as previous.</p>
+      <h1>Line Following</h1>
+      <img class="imgr borderedbox inspace-5" src="../images/demo/LineFollowing.PNG" alt="">
+      <p><b>Figure 1:</b> Line following code </p>
+      <p>While the robot is moving forward, we poll each light sensor. If the right sensor detects the line, the robot is veering to the left, so the robot turns right to center itself with respects to the line (vice versa for the left sensor).</p>
       </div>
     <!-- ################################################################################################ -->
   </footer>
@@ -80,9 +80,10 @@ Licence URI: http://www.os-templates.com/template-terms
 <div class="wrapper row4">
   <footer id="footer" class="hoc clear"> 
     <div class="content">
-      <h1> Reading from a Potentiometer</h1>
+      <h1>Square Following</h1>
       <img class="imgr borderedbox inspace-5" src="../images/demo/Potentiometer.png" alt="">
-      <p>Attached potentiometer to pin A0 to test analog input. Screenshot is the serial port output showing the values from the potentiometer.</p>
+      <p><b>Figure 2:</b> Square following code </p>
+      <p>As an intermediate step we had the robot take all left turns in a square. These turns, that we called auto_left and auto_right, use the following logic. The robot turns for a finite amount of time in order for the outside sensor to pass over the current white line and white line opposite its motion. Then it continues to turn until the outside sensor hits the white line, signalling that it is again straddling the line. This method was slightly difficult to tune and implement; for the future, 3 sensors may be easier.</p>
       </div>
     <!-- ################################################################################################ -->
   </footer>
@@ -90,49 +91,10 @@ Licence URI: http://www.os-templates.com/template-terms
 <div class="wrapper row4">
   <footer id="footer" class="hoc clear"> 
     <div class="content">
-      <h1> Using Potentiometer to Control the LED</h1>
+      <h1>Figure 8/h1>
       <img class="imgr borderedbox inspace-5" src="../images/demo/PotentiometerLED.gif" alt="">
-      <p>Changed OUT_PIN from potentiometer to pin A0. PWM signal outputted from scaled output of potentiometer drove brightness of LED.</p>
-      </div>
-    <!-- ################################################################################################ -->
-  </footer>
-</div>
-<div class="wrapper row4">
-  <footer id="footer" class="hoc clear"> 
-    <div class="content">    
-      <h1>Using Potentiometer to Control A Servo</h1>
-      <img class="imgr borderedbox inspace-5" src="../images/demo/PotentiometerServo.gif" alt="">
-      <p>Changed OUT_PIN from LED to pin 9. PWM signal outputted from scaled output of potentiometer drove speed and rotation direction of servo.</p> 
-      </div>
-    <!-- ################################################################################################ -->
-  </footer>
-</div>
-<div class="wrapper row4">
-  <footer id="footer" class="hoc clear"> 
-    <div class="content">
-      <h1> Assembling the Robot</h1>
-      <img class="imgr borderedbox inspace-5" src="../images/demo/Robot.png" alt="">
-      <p>Assembled robot using acrylic laser cut chassis and wheels, 3d printed servo holders and back strut. Velcroed battery to bottom and Arduino to top. We had one high port and two servos that needed a high connection. In order to avoid putting a large breadboard on our robot, we soldered servo high wires to each other and connected to arduino 5V pin.</p>
-      </div>
-    <!-- ################################################################################################ -->
-  </footer>
-</div>
-<div class="wrapper row4">
-  <footer id="footer" class="hoc clear"> 
-    <div class="content">    
-      <h1>Robot Moving Autonomously On Line</h1>
-      <img class="imgr borderedbox inspace-5" src="../images/demo/Line.gif" alt="">
-      <p>Drove robot autonomously in a straight(ish) line.</p>
-      </div>
-    <!-- ################################################################################################ -->
-  </footer>
-</div>
-<div class="wrapper row4">
-  <footer id="footer" class="hoc clear"> 
-    <div class="content"> 
-      <h1>Robot Driving Autonomously On a Square</h1>
-      <img class="imgr borderedbox inspace-5" src="../images/demo/Square.gif" alt="">
-      </p>Drove robot autonomously in a square (servos still need calibrating).</p>
+      <p><b>Figure 2:</b> Figure 8 code </p>
+      <p>When our light sensors detect an intersection (both light sensors detect a white line), our robot turns left or right then continues to follow the line until the next intersection. To traverse a figure 8, our robot turns right at the first intersection, left for 4 intersections, and right for 2 intersections. At the eighth intersection, our robot stops moving.</p>
       </div>
     <!-- ################################################################################################ -->
   </footer>
