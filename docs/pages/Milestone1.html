@@ -56,12 +56,38 @@ Licence URI: http://www.os-templates.com/template-terms
 <!-- ################################################################################################ -->
 <!-- ################################################################################################ -->
 <!-- ################################################################################################ -->
+  <div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content"> 
+      <!-- ################################################################################################ -->
+      <h1>Goal</h1>
+      <p>Milestone 1 required us to create a robot capable of consistently following a white line on a black grid, as well turn both left and right onto perpendicular lines. This needed to involve integrating a number of intermediate steps. We had build the robot so that it ran consistently, connect and tune the light sensors, write a program for reading all sensor data, and a program for following lines and turning from one line onto another. This required an understanding of the data types and language associated with the servos and analog inputs.</p>
+      </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+   <div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content"> 
+      <!-- ################################################################################################ -->
+      <h1>Materials</h1>
+      <p>1 Arduino Uno 
+1 USB A/B Cable
+2 Continuous Rotation Servos
+2 Line Sensors
+1 Battery Pack
+Laser Cut Acrylic and 3D printed Custom Lab Assembly Pieces
+</p>
+      </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
 <div class="wrapper row4">
   <footer id="footer" class="hoc clear"> 
     <div class="content"> 
       <!-- ################################################################################################ -->
       <h1>Adding Hardware</h1>
-      <p>We added 2 light sensors in the front of the robot to detect if the robot has veered off the line and to detect intersections. We placed these about 2 inches apart in order to straddle the line. In addition we swapped out our oversized wheels for smaller, more stable ones. This improved the consistency of our motion but did mean we had to retune the cutoff value between black and white for the light sensor.</p>
+      <p>To create a more consistent frame, we swapped out our oversized wheels for smaller, more stable ones. We added 2 light sensors in the front of the robot just wide enough for them to straddle the line. This meant that if the robot veered off course slightly, one of the sensors would be above the white line and detect it. Since they were placed in parallel, when the robot crossed a perpendicular piece of tape, both sensors would detect it. Some basic testing of the light sensors with the ADC showed us that between ¼” and ½” above the ground created a large difference in ADC readings between a dark and light surface.</p>
       </div>
     <!-- ################################################################################################ -->
   </footer>
@@ -72,7 +98,7 @@ Licence URI: http://www.os-templates.com/template-terms
       <h1>Line Following</h1>
       <img class="imgr borderedbox inspace-5" src="../images/demo/LineFollowing.PNG" alt="">
       <p><b>Figure 1:</b> Line following code </p>
-      <p>While the robot is moving forward, we poll each light sensor. If the right sensor detects the line, the robot is veering to the left, so the robot turns right to center itself with respects to the line (vice versa for the left sensor).</p>
+     <p>We used analog light sensors because we had a strong understanding of the ADC process and decided they would work well for us. These sensors outputted a value between 0 and 1000. The darker the line, the higher the number. When we held our sensors at the set distance over the white tape and the black mat, we found that the darker surface outputted numbers between 600 and 800 while the light surface was between 50 and 400. Therefore we set a cutoff value at 500. Below that value was assumed to be tape, above was not.</p>
       <img class="imgl borderedbox inspace-5" src="../images/demo/LineFollowing.gif" alt="">
     </div>
     <!-- ################################################################################################ -->
@@ -84,7 +110,7 @@ Licence URI: http://www.os-templates.com/template-terms
       <h1>Square Following</h1>
       <img class="imgr borderedbox inspace-5" src="../images/demo/Square.PNG" alt="">
       <p><b>Figure 2:</b> Square following code </p>
-      <p>As an intermediate step we had the robot take all left turns in a square. These turns, that we called auto_left and auto_right, use the following logic. The robot turns for a finite amount of time in order for the outside sensor to pass over the current white line and white line opposite its motion. Then it continues to turn until the outside sensor hits the white line, signalling that it is again straddling the line. This method was slightly difficult to tune and implement; for the future, 3 sensors may be easier.</p>
+      <p> To turn the robot we first had to detect the junction. We did this by detecting when both sensors were on the tape. As an intermediate step before the figure eight we had the robot take all left turns in a square. These turns, that we called auto_left and auto_right, use the following logic. The robot turns for a finite amount of time in order for the outside sensor to pass over the current white line and white line opposite its motion. Then it continues to turn until the outside sensor hits the white line, signalling that it is again straddling the line. This method was slightly difficult to tune and implement; for the future, 3 sensors may be easier. </p>
       <img class="imgr borderedbox inspace-5" src="../images/demo/SquareFollowing.gif" alt="">
     </div>
     <!-- ################################################################################################ -->
@@ -96,7 +122,7 @@ Licence URI: http://www.os-templates.com/template-terms
       <h1>Figure 8</h1>
       <img class="imgr borderedbox inspace-5" src="../images/demo/Figure8.PNG" alt="">
       <p><b>Figure 2:</b> Figure 8 code </p>
-      <p>When our light sensors detect an intersection (both light sensors detect a white line), our robot turns left or right then continues to follow the line until the next intersection. To traverse a figure 8, our robot turns right at the first intersection, left for 4 intersections, and right for 2 intersections. At the eighth intersection, our robot stops moving.</p>
+      <p>The final step was to integrate the turning steps with a planned path. To traverse a figure eight, our robot turns right at the first intersection, left for 4 intersections, and right for 2 intersections. At the eighth intersection, our robot stops moving. When our light sensors detect an intersection (both light sensors detect a white line), our robot turns left or right then continues to follow the line until the next intersection. sections, and right for 2 intersections.</p>
       <img class="imgr borderedbox inspace-5" src="../images/demo/Figure8.gif" alt="">
     </div>
     <!-- ################################################################################################ -->
