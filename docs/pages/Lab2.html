@@ -81,7 +81,6 @@ Licence URI: http://www.os-templates.com/template-terms
   <footer id="footer" class="hoc clear"> 
     <div class="content">
       <h1><b>Acoustic Signal Processing</b></h1>
-      <img class="imgr borderedbox inspace-5" src="../images/demo/Potentiometer.png" alt="">
       </div>
     <!-- ################################################################################################ -->
   </footer>
@@ -131,6 +130,92 @@ Licence URI: http://www.os-templates.com/template-terms
     <!-- ################################################################################################ -->
   </footer>
 </div>
+  <div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content">
+      <h1><b>Optical Signal Processing</b></h1>
+      </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+  <div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content">    
+      <h1><b>Materials</b></h1>
+      <img class="imgr borderedbox inspace-5" src="../images/demo/PotentiometerServo.gif" alt="">
+      <p>Arduino Uno</p> 
+      <p>IR transistor (OP598)</p> 
+      <p>IR hat</p> 
+      <p>IR decoy</p> 
+      <p>LM358 Op-Amp</p> 
+      <p>Various Resistors</p> 
+      <p>Breadboards</p> 
+     <p> Wiring</p> 
+      
+      </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+  <div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content">    
+      <h1><b>Hardware Procedure</b></h1>
+      <p>We began by investigating how well we could read infrared light through our sensor. The circuit for this is shown below. The sensor used is a phototransistor which will pass more current when the more infrared light is hitting it. This means that in the absence of infrared, Vout will read 0V while when the phototransistor is saturated, it would read 5V. By hooking up this circuit to power and attaching an oscilloscope probe to Vout, we were able to read the frequency and amplitude of this signal. </p>       
+      </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+  <div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content">    
+      <h1><b>Hardware Procedure</b></h1>
+      <p>We decided that we’d only need to detect treasures within 6 inches to 18 inches away from our robot, so we held infrared sources these distances away, oriented so that the photodiode could read them. The oscilloscope reading at these distances is shown below. The IR hat is outputting a frequency of 6.08kHz.</p>       
+      </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+  <div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content">    
+      <h1><b>Hardware Procedure</b></h1>
+      <p>Within our range of distances, we noticed that the magnitude of the signal varied from 100 mV to 500 mV. Although we expected our Arduino’s ADC to be able to properly read this signal, the lab required that we built a circuit component so built a non-inverting op-amp with a gain of 11.</p>       
+      </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+   <div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content">    
+      <h1><b>Hardware Procedure</b></h1>
+      <p>In this image, the input signal is CH1, the output CH2. These signals have the same period an shape, only differing by a magnitude of ~10. This confirmed our op-amp worked.
+
+After we’d validated both our infrared circuit and op-amp, we connected the output of the circuit of the input of the op-amp and the output of the op-amp to ADC port 1 of the Arduino. 
+</p>
+    </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+  <div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content">    
+      <h1><b>Software Procedure</b></h1>
+      <p>Below is our modified fft code used to transform the input analog signal and output the frequency components. We first tuned the fft by taking one cycle with no infrared input.
+
+Figure #9 #IMAGE OF FFT OUT WITH CONTROL
+
+In order to see what buckets corresponded to the IR hat signal, we took another cycle with the IR Hat pointed at the sensor
+        Figure #10 #IMAGE OF FFT OUT WITH 6.08 kHz SIGNAL
+
+In order to detect, the 6.08 kHz we put the fft program in a loop and set an if statement for the case that the corresponding buckets had values over a certain threshold. After some brief tuning, our system was able to detect the 6.08 kHz hat and ignore the 18 kHz decoy. When it detected the proper signal, a statement was printed in the serial window. In the future, we will connect this detection logic to our larger project to detect treasures.
+
+Figure #11 #VIDEO OF IT WORKING  (fake news IR and Real IR detected in media folder)
+
+OVERALL COMBINATION OF BOTH IR DETECTION AND MICROPHONE
+</p>
+    </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
       <!-- ################################################################################################ -->
     </div>
     <!-- ################################################################################################ -->
@@ -139,16 +224,7 @@ Licence URI: http://www.os-templates.com/template-terms
   </main>
 </div>
 </div>
-<div class="wrapper row4">
-  <footer id="footer" class="hoc clear"> 
-    <div class="content">    
-      <h1>Using Potentiometer to Control A Servo</h1>
-      <img class="imgr borderedbox inspace-5" src="../images/demo/PotentiometerServo.gif" alt="">
-      <p>Changed OUT_PIN from LED to pin 9. PWM signal outputted from scaled output of potentiometer drove speed and rotation direction of servo.</p> 
-      </div>
-    <!-- ################################################################################################ -->
-  </footer>
-</div>
+
 <!-- ################################################################################################ -->
 <!-- ################################################################################################ -->
 <!-- ################################################################################################ -->
