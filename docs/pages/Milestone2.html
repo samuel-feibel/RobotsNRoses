@@ -61,7 +61,7 @@ Licence URI: http://www.os-templates.com/template-terms
     <div class="content"> 
       <!-- ################################################################################################ -->
       <h1>Goal</h1>
-      <p>Milestone 1 required us to create a robot capable of consistently following a white line on a black grid, as well turn both left and right onto perpendicular lines. This needed to involve integrating a number of intermediate steps. We had build the robot so that it ran consistently, connect and tune the light sensors, write a program for reading all sensor data, and a program for following lines and turning from one line onto another. This required an understanding of the data types and language associated with the servos and analog inputs.</p>
+      <p>Milestone 2 required us to integrate all the actions we programmed previously into one design.</p>
       </div>
     <!-- ################################################################################################ -->
   </footer>
@@ -77,6 +77,9 @@ Licence URI: http://www.os-templates.com/template-terms
       <p> <b>   2 Line Sensors </b> </p>
       <p> <b>   1 Battery Pack </b> </p>
       <p> <b>   Laser Cut Acrylic and 3D printed Custom Lab Assembly Pieces </b> </p>
+      <p> <b>   Microphone </b> </p>
+      <p> <b>   Breadboard </b> </p>
+      <p> <b>   IR Wall Sensor </b> </p>
       </div>
     <!-- ################################################################################################ -->
   </footer>
@@ -85,8 +88,9 @@ Licence URI: http://www.os-templates.com/template-terms
   <footer id="footer" class="hoc clear"> 
     <div class="content"> 
       <!-- ################################################################################################ -->
-      <h1>Adding Hardware</h1>
-      <p>To create a more consistent frame, we swapped out our oversized wheels for smaller, more stable ones. We added 2 light sensors in the front of the robot just wide enough for them to straddle the line. This meant that if the robot veered off course slightly, one of the sensors would be above the white line and detect it. Since they were placed in parallel, when the robot crossed a perpendicular piece of tape, both sensors would detect it. Some basic testing of the light sensors with the ADC showed us that between ¼” and ½” above the ground created a large difference in ADC readings between a dark and light surface.</p>
+      <h1>Adding Wall Detection and Integrating</h1>
+      <img class="imgl borderedbox inspace-5" src="../images/demo/integratedcodeg.PNG" alt="">
+      <p>We added an IR wall sensor to the right of the robot and gave it the simple code that, upon reaching an intersection (i.e. both line sensors on either side read WHITE), consisted of if(WALL_DETECTED) move_forwad() else turn_right(). After the turn, it would resume basic line following capabilities. </p>
       </div>
     <!-- ################################################################################################ -->
   </footer>
@@ -94,35 +98,8 @@ Licence URI: http://www.os-templates.com/template-terms
 <div class="wrapper row4">
   <footer id="footer" class="hoc clear"> 
     <div class="content">
-      <h1>Line Following</h1>
-      <img class="imgr borderedbox inspace-5" src="../images/demo/LineFollowing.PNG" alt="">
-      <p><b>Figure 1:</b> Line following code </p>
-     <p>We used analog light sensors because we had a strong understanding of the ADC process and decided they would work well for us. These sensors outputted a value between 0 and 1000. The darker the line, the higher the number. When we held our sensors at the set distance over the white tape and the black mat, we found that the darker surface outputted numbers between 600 and 800 while the light surface was between 50 and 400. Therefore we set a cutoff value at 500. Below that value was assumed to be tape, above was not.</p>
-      <img class="imgl borderedbox inspace-5" src="../images/demo/LineFollowing.gif" alt="">
-    </div>
-    <!-- ################################################################################################ -->
-  </footer>
-</div>
-<div class="wrapper row4">
-  <footer id="footer" class="hoc clear"> 
-    <div class="content">
-      <h1>Square Following</h1>
-      <img class="imgr borderedbox inspace-5" src="../images/demo/Square.PNG" alt="">
-      <p><b>Figure 2:</b> Square following code </p>
-      <p> To turn the robot we first had to detect the junction. We did this by detecting when both sensors were on the tape. As an intermediate step before the figure eight we had the robot take all left turns in a square. These turns, that we called auto_left and auto_right, use the following logic. The robot turns for a finite amount of time in order for the outside sensor to pass over the current white line and white line opposite its motion. Then it continues to turn until the outside sensor hits the white line, signalling that it is again straddling the line. This method was slightly difficult to tune and implement; for the future, 3 sensors may be easier. </p>
-      <img class="imgr borderedbox inspace-5" src="../images/demo/SquareFollowing.gif" alt="">
-    </div>
-    <!-- ################################################################################################ -->
-  </footer>
-</div>
-<div class="wrapper row4">
-  <footer id="footer" class="hoc clear"> 
-    <div class="content">
-      <h1>Figure 8</h1>
-      <img class="imgr borderedbox inspace-5" src="../images/demo/Figure8.PNG" alt="">
-      <p><b>Figure 2:</b> Figure 8 code </p>
-      <p>The final step was to integrate the turning steps with a planned path. To traverse a figure eight, our robot turns right at the first intersection, left for 4 intersections, and right for 2 intersections. At the eighth intersection, our robot stops moving. When our light sensors detect an intersection (both light sensors detect a white line), our robot turns left or right then continues to follow the line until the next intersection. sections, and right for 2 intersections.</p>
-      <img class="imgr borderedbox inspace-5" src="../images/demo/Figure8.gif" alt="">
+      <h1>Final Robot actions</h1>
+      <iframe src="https://drive.google.com/file/d/16dqshiOWw5kYC1BS7f9VJdQoQe6-0sjQ/preview" width="640" height="480"></iframe>
     </div>
     <!-- ################################################################################################ -->
   </footer>
