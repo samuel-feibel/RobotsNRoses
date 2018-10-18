@@ -61,7 +61,7 @@ Licence URI: http://www.os-templates.com/template-terms
     <div class="content"> 
       <!-- ################################################################################################ -->
       <h1>Goal</h1>
-      <p>Milestone 2 required us to integrate all the actions we programmed previously into one design.</p>
+      <p>The purpose of this milestone was to add wall and robot sensing abilities to our system. The wall detection was integrated using a pre-built IR distance sensor. The mechanism to sense another robot was integrated using the photodiode sensor we built in Lab 2. In addition, this milestone required us to integrate software from each sensor into our main branch.</p>
       </div>
     <!-- ################################################################################################ -->
   </footer>
@@ -81,6 +81,34 @@ Licence URI: http://www.os-templates.com/template-terms
       <p> <b>   Breadboard </b> </p>
       <p> <b>   IR Wall Sensor </b> </p>
       </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+  <div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content"> 
+      <!-- ################################################################################################ -->
+      <h1>Wall Detection:</h1>
+      <p>For this milestone, we only needed to detect one wall at a time. To do this, we mounted an IR wall sensor on the right side of our robot and connected it to the XXX analog read pin. Since we only cared if the robot detected a wall or not, not the distance away, we just needed to find a threshold value for a wall about 4-6 inches from the side of the robot. This would represent the distance the robot would be from the wall inside the maze. Using this threshold value to detect a wall, we created the following code to be implemented in our robot’s motion.</p>
+      <img class="imgl borderedbox inspace-5" src="../images/demo/walldetection.PNG" alt="">
+      <p>The logic for wall following was also very simple. Whenever the robot reached an intersection, it would check if there was a wall to it’s right. If there was, it kept moving, if not it turned. This allowed it to navigate arbitrary walls using right-hand turns.</p>
+    </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+</div>
+  <div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content"> 
+      <!-- ################################################################################################ -->
+      <h1>Robot Detection:</h1>
+      <p> We detected other robots using the photodiode circuit and FFT program from our previous lab. We implemented this code as function XXX in order to detect when our robot recognizes a 6.08kHz signal. The code for XXX follows.</p>
+      <img class="imgl borderedbox inspace-5" src="../images/demo/robotdetection.PNG" alt="">
+      <p>Next, we implemented this function into the logic for our robot’s motion. This required turning off the clock whenever we ran the FFT because… This did not detect the rest of our program. 
+
+Our final logic allowed the robot to first check if it sensed another robot. If it did, it stopped until the other robot was not detected. Next, it would travel forward. Every time it met a junction it would check if it could turn right or if there was a wall. If there was no wall, it would turn. This is displayed below.
+</p>
+    </div>
     <!-- ################################################################################################ -->
   </footer>
 </div>
