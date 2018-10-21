@@ -168,10 +168,15 @@ void loop() {
                         ;
                     } 
                 } 
-                if(walls[right_wall]){ // maze algo
-                    move_forward();
-                } else {
+                if (walls[right_wall] && walls[dir] && walls[left_wall]){ // uturn
                     auto_right();
+                    auto_right(); 
+                } else if(walls[right_wall] && walls[dir] && !walls[left_wall]) { // R wall and F wall, turn left
+                    auto_left(); // change dir
+                } else if(walls[right_wall]) {   // R wall, move forward
+                    move_forward()// dir stays the same
+                } else { // turn right 
+                    auto_right(); // change dir  
                 }   
             }       
         } else { // exited explored intersection
