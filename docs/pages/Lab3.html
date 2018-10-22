@@ -82,17 +82,26 @@ Licence URI: http://www.os-templates.com/template-terms
     <div class="content">
       <h1><b>Communicating the Entire Maze</b></h1>
       <p>Storing Maze Information</p>
-      <img class="imgl borderedbox inspace-5" src="../images/demo/mazecode1.PNG" alt=""> 
-      <p>Figure 1: variables to encode maze info</p>
+      <figure>
+         <img src="../images/demo/mazecode1.PNG" alt="" />
+         <figcaption>Figure 1: variables to encode maze info</figcaption>
+      </figure>
       <p>We used dir to store the absolute direction the robot is facing. pos stores the robot’s position in x, y coordinates in the maze (Figure 1). curr_pos stores the robot’s current position in x, y coordinates in the maze. We use a 4 element array, walls, to store which walls are present at the current position. For example, if there is a wall to the East at cur_pos, walls[E] will be set to: </p>
-      <img class="imgl borderedbox inspace-5" src="../images/demo/mazecode2.PNG" alt="">
-      <p>Figure 2: determining the absolute directions of left and right</p>
+      <figure>
+         <img src="../images/demo/mazecode2.PNG" alt="" />
+         <figcaption>Figure 2: determining the absolute directions of left and right</figcaption>
+      </figure>
       <p>We determine the absolute direction of left and right using an enum with the absolute directions: E = 0, S = 1, W = 2, and N = 3. For example, if right_wall = W, if the robot turned right, it would be facing West (Figure 2). </p>
-      <img class="imgl borderedbox inspace-5" src="../images/demo/mazecode3.PNG" alt="">
-      <p>Figure 3: Right wall following (right wall sensor only)</p>
+      <figure>
+         <img src=".../images/demo/mazecode3.PNG" alt="" />
+         <figcaption>Figure 3: Right wall following (right wall sensor only)</figcaption>
+      </figure>
       <p>We used right wall following to navigate the maze (Figure 3). While the robot is at an intersection, if it detects a wall to its right, the robot will turn right. It will update dir to turn right if no wall was detected to the right. Using the updated direction variable (dir), we calculate the robot’s next position in the maze. Using coordinates (0, 0) as the upper left corner of the maze, we increment/decrement the x position if dir is East/West and increment/decrement the y position if dir is South/North. </p>
       <img class="imgl borderedbox inspace-5" src="../images/demo/mazecode4.PNG" alt="">
-      <p>Figure 4: Full Maze logic (all wall sensors: front, right, and left)</p>
+      <figure>
+         <img src=".../images/demo/mazecode4.PNG" alt="" />
+         <figcaption>Figure 4: Full Maze logic (all wall sensors: front, right, and left)</figcaption>
+      </figure>
       <p>Figure 4 shows full right wall following logic after integrating the front and left wall sensors. If walls are detected from all three sensors, the robot makes a uturn. If walls are detected in the front and to the right, the robot will turn left. If a wall is detected to the right only, the robot will move forward. If no walls or walls in the front and/or left are detected, the robot will turn right. </p>
     </div>
     <!-- ################################################################################################ -->
@@ -102,18 +111,24 @@ Licence URI: http://www.os-templates.com/template-terms
   <footer id="footer" class="hoc clear"> 
     <div class="content">
       <h1><b>Establishing Connection</b></h1>
-      <img class="imgl borderedbox inspace-5" src="../images/demo/mazecode5.PNG" alt="">  
-      <p>Figure 5: radio setup</p>
+      <figure>
+         <img src=".../images/demo/mazecode5.PNG" alt="" />
+         <figcaption>Figure 5: radio setup</figcaption>
+      </figure>
       <p>Figure 5 shows our setup code for radio communication. We took the code from the “ping out” role in GettingStarted.ino to set up the transmitter arduino (Figure 5).  
     We used pipes 42 and 43 calculated from the formula: 2(3D + N) + X where D = 3, N = 24. </p>
-    <img class="imgl borderedbox inspace-5" src="../images/demo/mazecode6.PNG" alt="">  
-    <p>Figure 6: Maze encoding</p>
+      <figure>
+         <img src=".../images/demo/mazecode6.PNG" alt="" />
+         <figcaption>Figure 6: Maze encoding</figcaption>
+      </figure>
     <p>We used the 4 least significant bits to encode the ‘y’ position, the next four to encode the ‘x’ position. The next four to encode the East, South, West, North wall at position x, y in that order. A visual of the encoding is shown below. We send the value below when we detect an intersection.</p>
-    <img class="imgl borderedbox inspace-5" src="../images/demo/mazecode7.PNG" alt="">
-    <p>Figure 7: Decoding in Base Arduino</p>
+    <figure>
+         <img src=".../images/demo/mazecode7.PNG" alt="" />
+         <figcaption>Figure 7: Decoding in Base Arduino</figcaption>
+      </figure>
     <p>The base arduino receives the transmitted value via radio.read(). The value received is decoded, and the GUI is updated by printing a string:
 “2,3,west=false,north=true,east=false,south=false”
-Which is created by _print (Figure 8).</p>
+Which is created by _print (Figure 7).</p>
    </div>
     <!-- ################################################################################################ -->
   </footer>
