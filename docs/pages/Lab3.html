@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<!--
+Template Name: Kelaby
+Author: <a href="http://www.os-templates.com/">OS Templates</a>
+Author URI: http://www.os-templates.com/
+Licence: Free to use under our free template licence terms
+Licence URI: http://www.os-templates.com/template-terms
+-->
+<html>
+<head>
+<title>Lab 3</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link href="../layout/styles/layout.css" rel="stylesheet" type="text/css" media="all">
+</head>
+<body id="top">
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<div class="wrapper row2">
+  <nav id="mainav" class="hoc clear"> 
+    <!-- ################################################################################################ -->
+    <ul class="clear">
+      <li><a href="../index.html">Home</a></li>
+      <li class="active"><a class="drop" href="#">Pages</a>
+        <ul>
+          <li class="active"><a href="Labs.html">Labs</a></li>
+          <li><a href="Milestones.html">Milestones</a></li>
+          <li><a href="Team.html">Team</a></li>
+          <li><a href="Documents.html">Documents</a></li>
+        </ul>
+      </li>
+      <li><a href="#">Gallery</a></li>
+      <li><a href="#">Random Stuff</a></li>
+    </ul>
+    <!-- ################################################################################################ -->
+  </nav>
+</div>
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<div class="bgded overlay" style="background-image:url('./images/demo/backgrounds/logo.PNG');">
+  <div id="breadcrumb" class="hoc clear"> 
+    <!-- ################################################################################################ -->
+    <h6 class="heading">Robots 'N' Roses</h6>
+    <!-- ################################################################################################ -->
+    <!-- ################################################################################################ -->
+  </div>
+</div>
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content"> 
+      <!-- ################################################################################################ -->
+      <h1><b>Goal</b></h1>
+      <p>The goal of this lab was to implement a radio communication system to our robot. This allowed it to follow a maze and broadcast its position as well as map the maze on a separate GUI. We added this to our original system so that it was still capable of robot detection, 660 Hz triggering, and line following.</p>
+      </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+<div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content">
+      <h1><b>Materials</b></h1>
+      <p>          2x Arduino Uno</p>
+      <p>          2x Nordic nRF24L01 + Transceivers</p>
+      <p>          2x USB A/B Cables </p>
+      <p>          2x Radio Breakout Boards with Headers</p>
+      </div>
+    <!-- ################################################################################################ -->
+  </footer>
+<div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content">
+      <h1><b>Communicating the Entire Maze</b></h1>
+      <p>Storing Maze Information</p>
+      <img class="imgr borderedbox inspace-5" src="../images/demo/mazecode1.PNG" alt=""> 
+      <p>Figure 1: variables to encode maze info</p>
+      <p>We used dir to store the absolute direction the robot is facing. pos stores the robot’s position in x, y coordinates in the maze (Figure 1). curr_pos stores the robot’s current position in x, y coordinates in the maze. We use a 4 element array, walls, to store which walls are present at the current position. For example, if there is a wall to the East at cur_pos, walls[E] will be set to: </p>
+      <img class="imgr borderedbox inspace-5" src="../images/demo/mazecode2.PNG" alt="">
+      <p>Figure 2: determining the absolute directions of left and right</p>
+      <p>We determine the absolute direction of left and right using an enum with the absolute directions: E = 0, S = 1, W = 2, and N = 3. For example, if right_wall = W, if the robot turned right, it would be facing West (Figure 2). </p>
+      <img class="imgr borderedbox inspace-5" src="../images/demo/mazecode3.PNG" alt="">
+      <p>Figure 3: Right wall following (right wall sensor only)</p>
+      <p>We used right wall following to navigate the maze (Figure 3). While the robot is at an intersection, if it detects a wall to its right, the robot will turn right. It will update dir to turn right if no wall was detected to the right. Using the updated direction variable (dir), we calculate the robot’s next position in the maze. Using coordinates (0, 0) as the upper left corner of the maze, we increment/decrement the x position if dir is East/West and increment/decrement the y position if dir is South/North. </p>
+      <img class="imgr borderedbox inspace-5" src="../images/demo/mazecode4.PNG" alt="">
+      <p>Figure 4: Full Maze logic (all wall sensors: front, right, and left)</p>
+      <p>Figure 4 shows full right wall following logic after integrating the front and left wall sensors. If walls are detected from all three sensors, the robot makes a uturn. If walls are detected in the front and to the right, the robot will turn left. If a wall is detected to the right only, the robot will move forward. If no walls or walls in the front and/or left are detected, the robot will turn right. </p>
+    </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+  <div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content">
+      <h1><b>Establishing Connection</b></h1>
+      <img class="imgr borderedbox inspace-5" src="../images/demo/mazecode5.PNG" alt="">  
+      <p>Figure 5: radio setup</p>
+      <p>Figure 5 shows our setup code for radio communication. We took the code from the “ping out” role in GettingStarted.ino to set up the transmitter arduino (Figure 5).  
+    We used pipes 42 and 43 calculated from the formula: 2(3D + N) + X where D = 3, N = 24. </p>
+    <img class="imgr borderedbox inspace-5" src="../images/demo/mazecode6.PNG" alt="">  
+    <p>Figure 6: Maze encoding</p>
+    <p>We used the 4 least significant bits to encode the ‘y’ position, the next four to encode the ‘x’ position. The next four to encode the East, South, West, North wall at position x, y in that order. A visual of the encoding is shown below. We send the value below when we detect an intersection.</p>
+    <img class="imgr borderedbox inspace-5" src="../images/demo/mazecode7.PNG" alt="">
+    <p>Figure 7: Decoding in Base Arduino</p>
+    <p>The base arduino receives the transmitted value via radio.read(). The value received is decoded, and the GUI is updated by printing a string:
+“2,3,west=false,north=true,east=false,south=false”
+Which is created by _print (Figure 8).</p>
+   </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+<div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content">    
+      <h1><b>Integration</b></h1>
+     <p> We combined the RF code with our maze following code. In order to demonstrated the RF, robot detection, and decoy disregarding, we ran the same system on the same maze 3 times, introducing each feature each time. 
+
+The following is the robot broadcasting and following a maze using the right hand wall following method.</p>
+<iframe src="https://drive.google.com/file/d/1q8-swiLSNwFsLzUS_raUPXwkfT22M2Ej/preview" width="640" height="480"></iframe>
+<p>Next we had it detect an IR hat and stop.</p>
+<iframe src="https://drive.google.com/file/d/1EOrRtc9ofpEFg_GRP0CQjypNmNfoFmqS/preview" width="640" height="480"></iframe>
+<p>Finally, we had the system disregard a decoy IR frequency.</p>
+<iframe src="https://drive.google.com/file/d/1hKtZ1chM3xKBhJNQ_sT7FquHnyVlibyZ/preview" width="640" height="480"></iframe>
+<p>For most of our lab session, maze materials were scarce. However, we were able to verify our system on a more complicated maze.</p>
+ <iframe src="https://drive.google.com/file/d/1hES_QfrdfCHrNulajJ1kSoaDPFbnkSMK/preview" width="640" height="480"></iframe>
+ </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<div class="wrapper row5">
+  <div id="copyright" class="hoc clear"> 
+    <!-- ################################################################################################ -->
+    <p class="fl_left">Copyright &copy; 2016 - All Rights Reserved - <a href="#">Domain Name</a></p>
+    <p class="fl_right">Template by <a target="_blank" href="http://www.os-templates.com/" title="Free Website Templates">OS Templates</a></p>
+    <!-- ################################################################################################ -->
+  </div>
+</div>
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<a id="backtotop" href="#top"><i class="fa fa-chevron-up"></i></a>
+<!-- JAVASCRIPTS -->
+<script src="../layout/scripts/jquery.min.js"></script>
+<script src="../layout/scripts/jquery.backtotop.js"></script>
+<script src="../layout/scripts/jquery.mobilemenu.js"></script>
+</body>
+</html>
