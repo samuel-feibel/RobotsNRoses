@@ -21,12 +21,7 @@ reg pclk_posedge;
 
 	always @(posedge PCLK) begin
 		if (~VSYNC) begin 
-			if (HREF) begin 
-				if (X < 9'd176) begin // 176 columns  
-					X <= X + 1'b1; // inc X count
-				end else begin 
-					X <= 9'b0; // reset X count 
-				end 	
+			if (HREF) begin  	
 				if (CYCLE == 1'b0) begin
 					TEMP <= DATA;
 					CYCLE <= 1'b1;
@@ -36,6 +31,11 @@ reg pclk_posedge;
 					PIXEL_COLOR[4:2] <= {TEMP[2:0], DATA[7:5]}/6'b001001;
 					PIXEL_COLOR[1:0] <= DATA[4:0]/5'b00101;
 					W_EN <= 1'b1;
+					if (X < 9'd176) begin // 176 columns  
+						X <= X + 1'b1; // inc X count
+					end else begin 
+						X <= 9'b0; // reset X count 
+					end
 				end
 				
 			end
