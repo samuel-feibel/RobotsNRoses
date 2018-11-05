@@ -83,13 +83,13 @@ Licence URI: http://www.os-templates.com/template-terms
       <h1><b>Communicating the Entire Maze</b></h1>
       <p>Storing Maze Information</p>
       <img class="imgl borderedbox inspace-5" src="../images/demo/mazecode1.PNG" alt=""> 
-      <p>Figure 1: variables to encode maze info</p>
+      <p><pre>Figure 1: variables to encode maze info</pre></p>
       <p>We used dir to store the absolute direction the robot is facing. pos stores the robot’s position in x, y coordinates in the maze (Figure 1). curr_pos stores the robot’s current position in x, y coordinates in the maze. We use a 4 element array, walls, to store which walls are present at the current position. For example, if there is a wall to the East at cur_pos, walls[E] will be set to: </p>
       <img class="imgl borderedbox inspace-5" src="../images/demo/mazecode2.PNG" alt="">
-      <p>Figure 2: determining the absolute directions of left and right</p>
+      <p><pre>Figure 2: determining the absolute directions of left and right</pre></p>
       <p>We determine the absolute direction of left and right using an enum with the absolute directions: E = 0, S = 1, W = 2, and N = 3. For example, if right_wall = W, if the robot turned right, it would be facing West (Figure 2). </p>
       <img class="imgl borderedbox inspace-5" src="../images/demo/mazecode3.PNG" alt="">
-      <p>Figure 3: Right wall following (right wall sensor only)</p>
+      <p><pre>Figure 3: Right wall following (right wall sensor only)</pre></p>
       <p>We used right wall following to navigate the maze (Figure 3). While the robot is at an intersection, if it detects a wall to its right, the robot will turn right. It will update dir to turn right if no wall was detected to the right. Using the updated direction variable (dir), we calculate the robot’s next position in the maze. Using coordinates (0, 0) as the upper left corner of the maze, we increment/decrement the x position if dir is East/West and increment/decrement the y position if dir is South/North. </p>
       <img class="imgl borderedbox inspace-5" src="../images/demo/mazecode4.PNG" alt="">
       <p><pre>
@@ -105,11 +105,13 @@ Licence URI: http://www.os-templates.com/template-terms
     <div class="content">
       <h1><b>Establishing Connection</b></h1>
       <img class="imgl borderedbox inspace-5" src="../images/demo/mazecode5.PNG" alt="">  
-      <p>Figure 5: radio setup</p>
+      <p><pre>Figure 5: radio setup</pre></p>
       <p>Figure 5 shows our setup code for radio communication. We took the code from the “ping out” role in GettingStarted.ino to set up the transmitter arduino (Figure 5).  
     We used pipes 42 and 43 calculated from the formula: 2(3D + N) + X where D = 3, N = 24. </p>
     <img class="imgl borderedbox inspace-5" src="../images/demo/mazecode6.PNG" alt="">  
      <p> <pre>
+     
+     
      
      
      
