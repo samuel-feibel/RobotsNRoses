@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<!--
+Template Name: Kelaby
+Author: <a href="http://www.os-templates.com/">OS Templates</a>
+Author URI: http://www.os-templates.com/
+Licence: Free to use under our free template licence terms
+Licence URI: http://www.os-templates.com/template-terms
+-->
+<html>
+<head>
+<title>Lab 4</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link href="../layout/styles/layout.css" rel="stylesheet" type="text/css" media="all">
+</head>
+<body id="top">
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<div class="wrapper row2">
+  <nav id="mainav" class="hoc clear"> 
+    <!-- ################################################################################################ -->
+    <ul class="clear">
+      <li><a href="../index.html">Home</a></li>
+      <li class="active"><a class="drop" href="#">Pages</a>
+        <ul>
+          <li class="active"><a href="Labs.html">Labs</a></li>
+          <li><a href="Milestones.html">Milestones</a></li>
+          <li><a href="Team.html">Team</a></li>
+          <li><a href="Documents.html">Documents</a></li>
+        </ul>
+      </li>
+      <li><a href="#">Gallery</a></li>
+      <li><a href="#">Random Stuff</a></li>
+    </ul>
+    <!-- ################################################################################################ -->
+  </nav>
+</div>
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<div class="bgded overlay" style="background-image:url('./images/demo/backgrounds/logo.PNG');">
+  <div id="breadcrumb" class="hoc clear"> 
+    <!-- ################################################################################################ -->
+    <h6 class="heading">Robots 'N' Roses</h6>
+    <!-- ################################################################################################ -->
+    <!-- ################################################################################################ -->
+  </div>
+</div>
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content"> 
+      <!-- ################################################################################################ -->
+      <h1><b>Goal</b></h1>
+      <p>The purpose of this Lab was to setup and integrate an FPGA, Camera, Arduino system capable of detecting a square, rhombus or triangle shape as well as identifying it’s color and reporting it through the arduino. This required a number of different components. We had to setup the camera through I2C protocols, setup FPGA to Arduino communication, write FPGA software to read in and output camera data to a screen as well as perform image analysis through the FPGA and report it the arduino.</p>
+      </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+<div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content">
+      <h1><b>Materials</b></h1>
+      <p>          1 FPGA</p>
+      <p>          1 Arduino Uno</p>
+      <p>          1 OV7670 Camera</p>
+      </div>
+    <!-- ################################################################################################ -->
+  </footer>
+<div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content">
+      <h1><b>Camera SetUp</b></h1>
+      <p>We connected the camera to our Arduino I2C input. We ran a script to determine the I2C address of the camera, which was found to be 0x21. Then, we used this data sheet to figure out which registers to set on our camera. Here is a list of registers we had to modify and their functions:</p>
+      <pre>COM7: 
+            Reset all registers 
+            Choose camera resolution
+            Choose data output format (e.g. RGB)
+            Enable color bar test 
+          COM3:
+            Enable scaling (to change resolution)
+            CLKRC
+            Use external clock as internal clock
+          COM15:
+            Choose RGB format (e.g. 565, 555, 444)
+          RGB444:
+            Enable RGB444 output format
+          COM17:
+            Enable color bar test 
+          COM9:
+            Set AGC to 2x and freeze (reduces noise)</pre>
+        <p>Because our onboard memory is less than 300KB and each pixel is stored as 1 byte, we figured that the camera resolution should be set to QCIF (176x144 pixels per frame). Our VGA accepts RGB 332, so we chose RGB as our output format. After trying different combinations of RGB output formats and downsampling, our implementation with RGB444 outputs managed to produce a sharp image that can distinguish red and blue from other colors.</p>
+        <img class="imgl borderedbox inspace-5" src="../images/demo/cameracode.PNG" alt="">
+        </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+<div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content">
+      <h1><b>Image Processing</b></h1>
+      <p>Our image analysis program is tasked with identifying whether or not there is a target on screen, if it is red or blue, and if it is a rhombus, square, or triangle. For this lab we focused on detecting if there was a target, and if so, what color it was. In order for this to work, our camera had to be able to differentiate red and blue colors. Through our FPGA camera read in program above, the camera outputted images where red appeared light red and blue appeared black. Though this was difficult for the human eye, it properly differentiated colors and worked for our image analysis. Our original output images looked like that below.</p>
+      <img class="imgl borderedbox inspace-5" src="../images/demo/color1.PNG" alt="">
+      <p>In order to identify targets we first had to identify which pixels belonged to a target and which did not. Since the blue pixels appeared as black, we set every bit with the Pixel Color 00000000 (black) to 00000011 (blue) in the camera stage and every other bit to 00000000 (black). This changes the output image to one that only shows the blue target in blue and nothing else. We tested this and received the image below. Next we had to set a threshold to find the red target pixels. These pixels had some red in them,  Pixel [7:5] > 001, and less green or blue, Pixel [4:2] < 100. Next we set any bit within this threshold to be outputted as bright red (11100000) and all other bits (other than the blue) to be outputted as black. By performing the first step of image analysis in the camera module, debugging the system became easier because we could see what the image analysis was seeing on-screen.</p>
+      <p>Next we had to detect if a target was on screen. We did this by counting the color pixels in every frame on the V_Sync rising edge. If the number of blue or red pixels were above an empirically measured threshold, there was a blue or red target on screen. If not, there was no target. After tuning the system we were successfully able to detect Red, Blue or no target using the code below.</p>
+      <img class="imgl borderedbox inspace-5" src="../images/demo/imageprocessor.PNG" alt="">
+      <p>For the final step we outputted a 3 bit signal to the Arduino through three wires to report the results of the image processor. The lowest bit was the color bit with 1 corresponding to blue and 0 corresponding to red. The second bit was the target bit with zero corresponding to no target and 1 corresponding to target. The highest bit was unused for this current setup but would be implemented once we began to identify shapes as well as color. </p>
+      <p>The final working version is shown below.</p>
+      <iframe src="VIDEO" width="640" height="480"></iframe>  
+   </div>
+  </footer>
+</div>
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<div class="wrapper row5">
+  <div id="copyright" class="hoc clear"> 
+    <!-- ################################################################################################ -->
+    <p class="fl_left">Copyright &copy; 2016 - All Rights Reserved - <a href="#">Domain Name</a></p>
+    <p class="fl_right">Template by <a target="_blank" href="http://www.os-templates.com/" title="Free Website Templates">OS Templates</a></p>
+    <!-- ################################################################################################ -->
+  </div>
+</div>
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<a id="backtotop" href="#top"><i class="fa fa-chevron-up"></i></a>
+<!-- JAVASCRIPTS -->
+<script src="../layout/scripts/jquery.min.js"></script>
+<script src="../layout/scripts/jquery.backtotop.js"></script>
+<script src="../layout/scripts/jquery.mobilemenu.js"></script>
+</body>
+</html>
