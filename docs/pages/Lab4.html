@@ -81,7 +81,8 @@ Licence URI: http://www.os-templates.com/template-terms
     <div class="content">
       <h1><b>Camera SetUp</b></h1>
       <p>We connected the camera to our Arduino I2C input. We ran a script to determine the I2C address of the camera, which was found to be 0x21. Then, we used this data sheet to figure out which registers to set on our camera. Here is a list of registers we had to modify and their functions:</p>
-      <pre>COM7: 
+      <pre>
+          COM7: 
             Reset all registers 
             Choose camera resolution
             Choose data output format (e.g. RGB)
