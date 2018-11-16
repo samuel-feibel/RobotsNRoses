@@ -14,7 +14,7 @@ bool hat_detected = false;
 bool start_detected = false;
 int count660 = 0;
 // light sensor constants
-const int GREY       = 650;
+const int GREY       = 700;
 // pin constants
 const int HAT_SENSOR = A0; // TODO same as L_WALL
 const int L_LIGHT    = A2;
@@ -34,7 +34,7 @@ int r_light = 0;
 const int R_WALL = A1;
 const int L_WALL = A0;
 const int F_WALL = A5;
-const int WALL_THRESHOLD = 200;
+const int WALL_THRESHOLD = 100;
 //adc default 
 unsigned int timsko = 0;
 unsigned int admux = 0;
@@ -63,10 +63,27 @@ typedef struct {
     byte node_dir; // dir robot was facing when it entered that node 
     bool visited;
 } node;
-node curr_node;
-const byte COL = 9;
-const byte ROW = 9; 
-node maze[ROW][COL]; // maze[x][y]
+const byte ROW = 5; 
+const byte COL = 4;
+node zero_node = {0, 0};
+node maze[ROW][COL] = {
+    {zero_node, zero_node, zero_node, zero_node},
+    {zero_node, zero_node, zero_node, zero_node},
+    {zero_node, zero_node, zero_node, zero_node},
+    {zero_node, zero_node, zero_node, zero_node},
+    {zero_node, zero_node, zero_node, zero_node}     
+}; // maze[x][y]
+node curr_node = maze[0][0];
+bool exited = 0;
+// intersection detection variables 
+const int thresh = 750;
+//How responsive Slash is to detecting intersections, the higher the value, the less responsive.
+int count_enter = 0;
+//How long Slash must wait after detecting an intersection before he can detect another one, the higher the value, the longer the wait.
+int count_exit = 0;
+int count_thresh_enter = 250;
+int count_thresh_exit = 25;
+bool intersection_detect = false;
 
 void setup() {
     Serial.begin(9600); // use the serial port
@@ -79,11 +96,10 @@ void setup() {
     pinMode(12, OUTPUT);
     digitalWrite(12, LOW);
     // radio_setup();
-    dfs_setup();
+    Serial.println("setup");
 }
 
 void loop() {
-    move_forward(); // test
     l_light = analogRead(L_LIGHT);
     r_light = analogRead(R_LIGHT);
 //    while(!start_detected) {
@@ -99,17 +115,55 @@ void loop() {
 //        delay(1000);
 //        check_for_hat();
 //    }
+//    if (l_light < GREY && r_light < GREY) {
+//        if(!exited){
+//            detect_walls();
+//            exited = 1;
+//        } 
+//    }
+
+//    detect_intersection();
+//    if (intersection_detect){
+//        detect_walls();
     if (l_light < GREY && r_light < GREY) {
         detect_walls();
-    }
-    else if(l_light < GREY){ 
+    } else if(l_light < GREY){ 
+        exited = 0;
         nudge_left();  
     } else if(r_light < GREY){
+        exited = 0;
         nudge_right();
     } else {
+        exited = 0;
         move_forward();
     }
     
+}
+
+bool detect_intersection(){
+    l_light = analogRead(L_LIGHT);
+    r_light = analogRead(R_LIGHT);
+    
+    //Detect the possibility of an intersection
+    if (l_light<thresh && r_light<thresh){
+        count_enter++;
+        
+        //Detecting a real intersection
+        if (count_enter > count_thresh_enter && count_exit>count_thresh_exit){
+            //Serial.println("Intersection Detected");
+            intersection_detect=true;
+            //Must start waiting before we can detect the next
+            count_exit=0;
+        }
+    }
+    //No intersection means that the timer is running to allow Slash to detect another intersection. 
+    else {
+        //Serial.println("No Intersection Detected");
+        intersection_detect=false;
+        count_enter=0;
+        count_exit++;
+        //Serial.println(count_exit);
+    }
 }
 
 void detect_walls(){
@@ -118,19 +172,55 @@ void detect_walls(){
     int r_wall = analogRead(R_WALL);
     int l_wall = analogRead(L_WALL);
     int f_wall = analogRead(F_WALL);
-    walls[right_wall] = !(r_wall < WALL_THRESHOLD);
-    walls[left_wall]  = !(l_wall < WALL_THRESHOLD);
-    walls[curr_dir]        = !(f_wall < WALL_THRESHOLD);
-    dfs(walls[right_wall], walls[left_wall], walls[dir]); // r , l, f
-    if (dir == curr_dir){
-        move_forward();
-    } else if (dir == left_wall) {
-        auto_left();
-    } else if (dir == right_wall) {
+    walls[0] = 0; // reset wall array
+    walls[1] = 0;
+    walls[2] = 0;
+    walls[3] = 0;
+    walls[right_wall] = r_wall > WALL_THRESHOLD;
+    walls[left_wall]  = l_wall > WALL_THRESHOLD;
+    walls[curr_dir]   = f_wall > WALL_THRESHOLD;
+    // to gui
+    String _print = String(pos[1]) + ","
+                   + String(pos[0]) + "," 
+                   + "west="  + bool_str(walls[W]) + ","
+                   + "north=" + bool_str(walls[N]) + ","
+                   + "east="  + bool_str(walls[E]) + ","
+                   + "south=" + bool_str(walls[S]);
+    Serial.println(_print);
+    if(walls[right_wall] && walls[left_wall] && walls[dir]){
+        Serial.println("turn around");
+        auto_180();
+        curr_dir = curr_dir + 2 % 4;
+    } else if (!walls[right_wall] && walls[dir]) {
+        Serial.println("turn right");
         auto_right();
+        curr_dir = right_wall;
+    } else if (!walls[left_wall] && walls[dir]) {
+        Serial.println("turn left");
+        auto_left();
+        curr_dir = left_wall;
     } else {
-        auto_180();    
+        Serial.println("move forward");
+        move_forward();
+        delay(200);
     }
+    // to gui 
+//    curr_dir = dir;
+//    dfs(walls[right_wall], walls[left_wall], walls[dir]); // r , l, f
+//    if (dir == curr_dir){ // if curr_dir == next dir
+//        move_forward();
+//        delay(200);
+//    } else if (dir == left_wall) {
+//        auto_left();
+//    } else if (dir == right_wall) {
+//        auto_right();
+//    } else {
+//        auto_180();    
+//    }
+}
+
+String bool_str(int b){
+  return b ? "true" : "false";
 }
 
 int get_x(int x, int d){ // dfs helper function
@@ -155,18 +245,17 @@ int get_y(int y, int d){ // dfs helper function
 
 
 void dfs(int right_wall, int left_wall, int forward_wall) {  
-    curr_dir = dir;
     byte right = (dir + 1) % 4;
     byte left = (dir + 3) % 4;
     
     byte x = pos[0]; // current node 
     byte y = pos[1];
-    if (!maze[x][y].visited) { // if curr_node not visited 
-        maze[x][y].node_dir = dir;
-        maze[x][y].visited = 1;
+    if (!maze[y][x].visited) { // if curr_node not visited 
+        maze[y][x].node_dir = dir;
+        maze[y][x].visited = 1;
     }
-    maze[0][0].node_dir = W;
-    curr_node = maze[x][y];
+    maze[0][0].node_dir = W; // corner case 
+    curr_node = maze[y][x];
 
     int f_x = get_x(x, dir); // pos of node in front of the current node
     int f_y = get_y(y, dir);
@@ -177,18 +266,22 @@ void dfs(int right_wall, int left_wall, int forward_wall) {
     int l_x = get_x(x, left); // pos of node to the left of the current node
     int l_y = get_y(y, left);
     
-    bool r_block = (right_wall)   ? 1 : maze[r_x][r_y].visited;
-    bool l_block = (left_wall)    ? 1 : maze[l_x][l_y].visited;
-    bool f_block = (forward_wall) ? 1 : maze[f_x][f_y].visited;
+    bool r_block = (right_wall)   ? 1 : maze[r_y][r_x].visited;
+    bool l_block = (left_wall)    ? 1 : maze[l_y][l_x].visited;
+    bool f_block = (forward_wall) ? 1 : maze[f_y][f_x].visited;
      
     if (r_block && l_block && f_block) { // 3 sides blocked 
         dir = (curr_node.node_dir + 2) % 4; 
+        Serial.println("back track");
     } else if (f_block && !r_block) { // front blocked and right not blocked
         dir = right;
+        Serial.println("turn right");
     } else if (f_block && !l_block) { //front blocked and left not blocked
-        dir = left;   
-    } // else dir = dir
-
+        dir = left;  
+        Serial.println("turn left"); 
+    } else {
+        Serial.println("move forward");    
+    }
     // update pos
     if (dir == N || dir == W) { // going west or north
         pos[dir % 2] --; 
