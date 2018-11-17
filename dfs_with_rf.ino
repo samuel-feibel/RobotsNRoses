@@ -40,10 +40,10 @@ unsigned int didro = 0;
 unsigned int adcsra = 0;
 //radio variables
 byte walls[4] = {0, 0, 0, 0};
-//RF24 radio(9,10);
-//const uint64_t pipes[2] = { 0x00000000042LL, 0x0000000043LL };
+RF24 radio(9,10);
+const uint64_t pipes[2] = { 0x00000000042LL, 0x0000000043LL };
 // encoding
-const byte W_OFFSET = 2; // walls 
+const byte W_OFFSET = 8; // walls 
 // DFS variables 
 enum _direction{E, S, W, N};
 byte prev_dir = E;
@@ -77,9 +77,7 @@ void setup() {
     admux = ADMUX;
     didro = DIDR0;
     adcsra = ADCSRA;
-    pinMode(12, OUTPUT);
-    digitalWrite(12, LOW);
-    //radio_setup();
+    radio_setup();
     Serial.println("setup");
 }
 
@@ -134,7 +132,7 @@ void detect_walls(){
     walls[right_wall] = r_wall > WALL_THRESHOLD;
     walls[left_wall]  = l_wall > WALL_THRESHOLD;
     walls[prev_dir]   = f_wall > WALL_THRESHOLD;
-    //rf_crap(); // RADIO
+    rf_crap(); // RADIO
     // to gui 
     dfs(walls[right_wall], walls[left_wall], walls[prev_dir]); // r , l, f
     if (dir == prev_dir){ 
@@ -224,31 +222,32 @@ void detect_treasure() {
   //to be written
 }
 
-//void rf_crap() { //radio
-//    int temp = 0; // temp = | walls | prev_dir |
-//    temp |= prev_dir;
-//    temp |= (walls[W] << (W_OFFSET + W));
-//    temp |= (walls[N] << (W_OFFSET + N));
-//    temp |= (walls[S] << (W_OFFSET + S));
-//    temp |= (walls[E] << (W_OFFSET + E)); //TODO the rest of the bits
-//    radio.stopListening();
-//    bool ok = radio.write( &temp, sizeof(unsigned long) );
-//    radio.startListening();
-//}
+void rf_crap() { //radio
+    int temp = 0; // temp = | walls | prev_dir |
+    temp |= pos[0]; // 1 byte
+    temp |= pos[1] << 4; // 1 byte 
+    temp |= (walls[W] << (W_OFFSET + W));
+    temp |= (walls[N] << (W_OFFSET + N));
+    temp |= (walls[S] << (W_OFFSET + S));
+    temp |= (walls[E] << (W_OFFSET + E)); //TODO the rest of the bits
+    radio.stopListening();
+    bool ok = radio.write( &temp, sizeof(unsigned long) );
+    radio.startListening();
+}
 
-//void radio_setup() {
-//    radio.begin(); 
-//    radio.setRetries(15,15);
-//    radio.setAutoAck(true);
-//    radio.setChannel(0x50);
-//    radio.setPALevel(RF24_PA_MIN);
-//    radio.setDataRate(RF24_250KBPS);
-//    radio.setPayloadSize(2);
-//    radio.openWritingPipe(pipes[0]); // role == role_ping_out
-//    radio.openReadingPipe(1,pipes[1]);
-//    radio.startListening();   
-//    Serial.println("radio setup finished"); 
-//}
+void radio_setup() {
+    radio.begin(); 
+    radio.setRetries(15,15);
+    radio.setAutoAck(true);
+    radio.setChannel(0x50);
+    radio.setPALevel(RF24_PA_MIN);
+    radio.setDataRate(RF24_250KBPS);
+    radio.setPayloadSize(4); // 3 bytes
+    radio.openWritingPipe(pipes[0]); // role == role_ping_out
+    radio.openReadingPipe(1,pipes[1]);
+    radio.startListening();   
+    Serial.println("radio setup finished"); 
+}
 
 void check_for_hat() {
     TIMSK0 = 0; // turn off timer0 for lower jitter
