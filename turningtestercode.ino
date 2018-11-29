@@ -6,8 +6,9 @@ Servo right;
 // light sensor constants
 const int GREY       = 600;
 // pin constants
-const int L_LIGHT    = A2;
-const int R_LIGHT    = A3;
+const int L_LIGHT    = 2;
+const int R_LIGHT    = 3;
+const int M_LIGHT    = 0;
 const int LEFT_PIN   = 6;
 const int RIGHT_PIN  = 5;
 // speed constants 
@@ -18,6 +19,7 @@ const int R_BACKWARD = 180;
 const int L_BACKWARD = 0;
 int l_light = 0;
 int r_light = 0;
+int m_light = 0;
 int figure_8 = 0;
 int wait = 1000;
 int turn_wait = 900;
@@ -25,26 +27,32 @@ int turn_wait = 900;
 void setup() {
   Serial.begin(9600); // read analog input
   left.attach(LEFT_PIN);
-  right.attach(RIGHT_PIN);
+  right.attach(RIGHT_PIN);  
+
 }
 // main function
-void loop() {
-  l_light = analogRead(L_LIGHT);
-  r_light = analogRead(R_LIGHT);
+void loop() { 
+  l_light = digitalRead(L_LIGHT);
+  r_light = digitalRead(R_LIGHT);
+  m_light = digitalRead(M_LIGHT);
   Serial.println(l_light);
   Serial.println(r_light);
+  Serial.println(m_light);
   Serial.println();
   Serial.println();
-  if (l_light < GREY && r_light < GREY) {
+  //if (l_light == 1 && r_light == 1) {
       //auto_right();
-      while(1){stop_moving();}
-  }
-  else if(l_light < GREY){ 
+      //while(1){stop_moving();
+  //}
+  
+  if(m_light ==0){ 
+    move_forward();  
+  } else if(l_light ==0){ 
     turn_left();  
-  } else if(r_light < GREY){
+  } else if(r_light ==0){
     turn_right();
-  } else {
-    move_forward();
+  }else {
+    stop_moving();
   }
   
 }
@@ -70,19 +78,19 @@ void stop_moving(){
 }
 void auto_right(){ 
     r_light = analogRead(R_LIGHT);
-    while(r_light < GREY){ // is white
+    while(r_light == 1){ // is white
       r_light = analogRead(R_LIGHT);
-      if(r_light > GREY) { 
+      if(r_light == 0) { 
         Serial.println("R_LIGHT IS GREY");
         break;
       }
       turn_right();
-      Serial.println("RLIGHT IS WHITE");
+      Serial.println("R_LIGHT IS WHITE");
     }
     l_light = analogRead(L_LIGHT);
-    while(l_light < GREY){ // is white
+    while(l_light == 1){ // is white
       l_light = analogRead(L_LIGHT);
-      if(l_light > GREY) { 
+      if(l_light == 0) { 
         Serial.println("L_LIGHT IS GREY");
         stop_moving();
         break;
