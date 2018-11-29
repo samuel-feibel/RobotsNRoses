@@ -1,0 +1,10 @@
+module camera( DATA, CLK, W_EN, PIXEL_X, PIXEL_Y)
+
+input [7:0] DATA;
+input CLK;
+
+output [7:0] PIXEL_COLOR;
+output W_EN;
+
+endmodule
+
