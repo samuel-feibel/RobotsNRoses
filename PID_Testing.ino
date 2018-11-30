@@ -12,7 +12,7 @@ const int M_LIGHT    = 0;
 const int LEFT_PIN   = 6;
 const int RIGHT_PIN  = 5;
 const int STOP = 90;
-const int BASE_SPEED = 6;
+const int BASE_SPEED = 5;
 const int K1 = 50;
 const int K2 = 30;
 int l_light = 0;
@@ -35,7 +35,7 @@ void loop() {
   m_light = digitalRead(M_LIGHT);
 
   if (l_light == 0 && r_light == 0) {
-      full_right();
+      full_left();
 
   }
 
@@ -64,7 +64,7 @@ void stop_moving(){
 }
 
 
-void full_right(){
+void full_left(){
   move_forward();
   delay(300/BASE_SPEED);
   right.write(R_FORWARD(100));
