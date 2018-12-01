@@ -108,6 +108,24 @@ Licence URI: http://www.os-templates.com/template-terms
 <div class="wrapper row4">
   <footer id="footer" class="hoc clear"> 
     <div class="content">
+      <h1><b>Arduino/FPGA Communication</b></h1>
+      <p>We wanted to ensure good communication between the FPGA and Arduino while keeping our protocol simple. We originally planned on creating a serial communication protocol, which would result in only having 2 wires between the Arduino and FPGA (A data line and a CLK line). However, upon further inspection, we decided that it would be much easier to use parallel communication with three wires. Each wire represented a bit we were trying to communicate from the FPGA to the Arduino. We only ever need to communicate shape and color to the Arduino. We need two bits for shape because a treasure could be 1 of 3 shapes. We need 1 bit for color because a treasure can only be 1 of 2 colors. This made our communication incredibly simple. The FPGA would just set the wires to be high or low depending on what the camera sees. </p>
+      <img class="imgl borderedbox inspace-5" src="../images/demo/camerabits.PNG" alt="">
+   </div>
+  </footer>
+</div>
+<div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content">
+      <h1><b>FPGA Camera Read-In</b></h1>
+      <p>In this part of the lab, we chose to use RGB 444 to read in bits bit the OC760, as this gave us more accurate image processing. When set to RGB 444, the OV760 sends out the first 8 bits as XXXXBBBB and the next as RRRRGGGG - contrary to what the OV760 data sheet says.  We originally were going to straight downsample the highest bits of each color to fit it to the 8-bit 332 format; however we found it would be more efficient to store all 4 bits of each color which would then be fed to the image processor for more precise color detection. Since we could not use variables in multiple always blocks driven by different conditions, we ended up storing the changes themselves in variables (e.g. VSYNC and lastSYNC) and assigned values based on that. The code snippet below shows under which conditions different variables were updated.</p>
+      <img class="imgl borderedbox inspace-5" src="../images/demo/cameracode2.PNG" alt="">
+   </div>
+  </footer>
+</div>
+<div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content">
       <h1><b>Image Processing</b></h1>
       <p>Our image analysis program is tasked with identifying whether or not there is a target on screen, if it is red or blue, and if it is a rhombus, square, or triangle. For this lab we focused on detecting if there was a target, and if so, what color it was. In order for this to work, our camera had to be able to differentiate red and blue colors. Through our FPGA camera read in program above, the camera outputted images where red appeared light red and blue appeared black. Though this was difficult for the human eye, it properly differentiated colors and worked for our image analysis. Our original output images looked like that below.</p>
       <img class="imgl borderedbox inspace-5" src="../images/demo/color.PNG" alt="">
@@ -116,6 +134,10 @@ Licence URI: http://www.os-templates.com/template-terms
       <img class="imgl borderedbox inspace-5" src="../images/demo/imageprocessor.PNG" alt="">
       <p>For the final step we outputted a 3 bit signal to the Arduino through three wires to report the results of the image processor. The lowest bit was the color bit with 1 corresponding to blue and 0 corresponding to red. The second bit was the target bit with zero corresponding to no target and 1 corresponding to target. The highest bit was unused for this current setup but would be implemented once we began to identify shapes as well as color. </p>
       <p>The final working version is shown below.</p>
+      <p><pre>
+      
+      
+      </p></pre>
       <iframe src="https://drive.google.com/file/d/1ZExJPjC79hcNjbYwW5jv7pWNTd3cxDBa/preview" width="640" height="480"></iframe>
    </div>
   </footer>
