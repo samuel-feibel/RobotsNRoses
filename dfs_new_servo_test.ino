@@ -17,15 +17,15 @@ byte count660 = 0;
 // pin constants
 const int HAT_SENSOR = A0; // TODO same as L_WALL
 // pin constants new servos
-const byte L_LIGHT    = 4;
-const byte R_LIGHT    = 2;
-const byte M_LIGHT    = 3;
-const byte LEFT_PIN   = 6;
-const byte RIGHT_PIN  = 5;
+const int L_LIGHT    = 2;
+const int R_LIGHT    = 4;
+const int M_LIGHT    = 3;
+const int LEFT_PIN   = 6;
+const int RIGHT_PIN  = 5;
 const int STOP = 90;
 const int BASE_SPEED = 5;
 const int K1 = 50;
-const int K2 = 0;
+const int K2 = 30;
 int l_light = 0;
 int r_light = 0;
 int m_light = 0;
@@ -76,6 +76,9 @@ node maze[9][9] = {
     {zero_node, zero_node, zero_node, zero_node, zero_node, zero_node, zero_node, zero_node, zero_node},
 };
 node curr_node = maze[0][0];
+int red = 7; // W
+int green = 1; // S
+int yellow = 0; // N
 
 void setup() {
     Serial.begin(9600); // use the serial port
@@ -87,12 +90,15 @@ void setup() {
     adcsra = ADCSRA;
     //radio_setup();
     Serial.println("setup");
+    pinMode(red, OUTPUT);
+    pinMode(green, OUTPUT);
+    pinMode(yellow, OUTPUT);
 }
 
 void loop() {
-    l_light = analogRead(L_LIGHT); // line detected if 0
-    r_light = analogRead(R_LIGHT);
-    m_light = analogRead(M_LIGHT);
+    l_light = digitalRead(L_LIGHT);
+    r_light = digitalRead(R_LIGHT);
+    m_light = digitalRead(M_LIGHT);
 //    while(!start_detected) {
 //        stop_moving();
 //        check_for_start();
@@ -103,8 +109,9 @@ void loop() {
 //        delay(1000);
 //        check_for_hat();
 //    }
-    if (l_light < GREY && r_light < GREY) {
+    if (l_light == 0 && r_light == 0) {
         detect_walls();
+        //full_180();
     } else {
         LINE_FOLLOWING(100);
     }
@@ -126,14 +133,16 @@ void detect_walls(){
     walls[left_wall]  = l_wall;
     walls[prev_dir]   = f_wall;
     // to gui
+    //Serial.println (String(pos[1]));
     String _print = String(pos[1]) + ","
                    + String(pos[0]) + "," 
                    + "curr_dir" + String(prev_dir) + "," 
-                   + "west="  + String(walls[W]) + "," // bool_str
-                   + "north=" + String(walls[N]) + ","
-                   + "east="  + String(walls[E]) + ","
-                   + "south=" + String(walls[S]) + ",";
-    Serial.println(_print);
+                   + "west="  + String(walls[W]) + "," 
+                   + "north=" + String(walls[N]) + ",";
+    String _print2 = "east="  + String(walls[E]) + ","
+                   + "south=" + String(walls[S]);
+    Serial.print (_print);
+    Serial.println (_print2);
     walls[right_wall] = r_wall > WALL_THRESHOLD;
     walls[left_wall]  = l_wall > WALL_THRESHOLD;
     walls[prev_dir]   = f_wall > WALL_THRESHOLD;
@@ -221,6 +230,23 @@ void dfs(int right_wall, int left_wall, int forward_wall) {
         dir = prev_dir;
         Serial.println("move forward");    
     }
+    if (dir == W){
+        digitalWrite(red, HIGH);
+        digitalWrite(green, LOW);
+        digitalWrite(yellow, LOW);
+    } else if (dir == S){
+        digitalWrite(red, LOW);
+        digitalWrite(green, HIGH);
+        digitalWrite(yellow, LOW);        
+    } else if (dir == N){
+        digitalWrite(red, LOW);
+        digitalWrite(green, LOW);
+        digitalWrite(yellow, HIGH);
+    } else {
+        digitalWrite(red, HIGH);
+        digitalWrite(green, HIGH);
+        digitalWrite(yellow, HIGH);
+    }
     // update pos
     if (dir == N || dir == W) { // going west or north
         pos[dir % 2] --; 
@@ -285,43 +311,48 @@ void stop_moving(){
   right.write(STOP);  
 }
 
+void full_left(){
+  move_forward();
+  delay(300/BASE_SPEED);
+  right.write(R_FORWARD(100));
+  left.write(L_BACKWARD(100));
+  delay(1200/BASE_SPEED);
+  m_light = digitalRead(M_LIGHT);
+    while(m_light == 1){ //  not on white
+      if(m_light == 0) { 
+        break;
+      }
+      m_light = digitalRead(M_LIGHT);
+    }
+}
 
 void full_right(){
   move_forward();
-  delay(150);
+  delay(300/BASE_SPEED);
   right.write(R_BACKWARD(100));
   left.write(L_FORWARD(100));
-  delay(300);
-  r_light = analogRead(R_LIGHT);
-    while(r_light > GREY){ //  not on white
-      r_light = analogRead(R_LIGHT);
+  delay(1200/BASE_SPEED);
+  m_light = digitalRead(M_LIGHT);
+    while(m_light == 1){ //  not on white
+      if(m_light == 0) { 
+        break;
+      }
+      m_light = digitalRead(M_LIGHT);
     }
 }
 
 void full_180(){
+    move_forward();
+    delay(200);
     full_left();
     right.write(R_FORWARD(100));
   left.write(L_BACKWARD(100));
-  delay(100);
-  l_light = analogRead(R_LIGHT);
-    while(l_light > GREY){ //  not on white
-      l_light = analogRead(L_LIGHT);
+  delay(500);
+  l_light = digitalRead(L_LIGHT);
+    while(l_light){ //  not on white
+      l_light = digitalRead(L_LIGHT);
     }
 }
-
-
-void full_left(){
-  move_forward();
-  delay(150);
-  right.write(R_FORWARD(100));
-  left.write(L_BACKWARD(100));
-  delay(300);
-  l_light = analogRead(L_LIGHT);
-    while(l_light > GREY){ //  not on white
-      l_light = analogRead(L_LIGHT);
-    }
-}
-
 
 int R_FORWARD(int K){
     return 90*(100-K*BASE_SPEED/100)/100;
@@ -342,21 +373,28 @@ int R_BACKWARD(int K){
 }
 
 void LINE_FOLLOWING(int TEMP_SPEED){
-  l_light = analogRead(L_LIGHT);
-  r_light = analogRead(R_LIGHT);
-  m_light = analogRead(M_LIGHT);
+  l_light = digitalRead(L_LIGHT);
+  r_light = digitalRead(R_LIGHT);
+  m_light = digitalRead(M_LIGHT);
   
   //Line Following
-    
-  if(l_light < GREY){ 
+  if(m_light ==0 && l_light == 0){ 
+    left.write(L_FORWARD(K1*TEMP_SPEED/100));
+    right.write(R_FORWARD(100*TEMP_SPEED/100));  
+  }else if(m_light ==0 && r_light == 0){ 
+    right.write(R_FORWARD(K1*TEMP_SPEED/100));
+    left.write(L_FORWARD(100*TEMP_SPEED/100));  
+  } else if(l_light ==0){ 
     left.write(L_FORWARD(K2*TEMP_SPEED/100));
     right.write(R_FORWARD(100*TEMP_SPEED/100));  
-  } else if(r_light < GREY){
+  } else if(r_light ==0){
     right.write(R_FORWARD(K2*TEMP_SPEED/100));
     left.write(L_FORWARD(100*TEMP_SPEED/100));
-  } else {
+  } else if(m_light ==0){
     right.write(R_FORWARD(100*TEMP_SPEED/100));
     left.write(L_FORWARD(100*TEMP_SPEED/100));
+  }else {
+    stop_moving();
   }
 }
 
