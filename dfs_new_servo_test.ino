@@ -9,6 +9,7 @@
 Servo left; 
 Servo right;
 // IR hat detector 
+const int GREY = 600;
 bool hat_detected = false;
 // microphone 
 bool start_detected = false;
@@ -16,15 +17,15 @@ byte count660 = 0;
 // pin constants
 const int HAT_SENSOR = A0; // TODO same as L_WALL
 // pin constants new servos
-const byte L_LIGHT    = 2;
-const byte R_LIGHT    = 3;
-const byte M_LIGHT    = 0;
+const byte L_LIGHT    = 4;
+const byte R_LIGHT    = 2;
+const byte M_LIGHT    = 3;
 const byte LEFT_PIN   = 6;
 const byte RIGHT_PIN  = 5;
 const int STOP = 90;
 const int BASE_SPEED = 5;
 const int K1 = 50;
-const int K2 = 30;
+const int K2 = 0;
 int l_light = 0;
 int r_light = 0;
 int m_light = 0;
@@ -50,9 +51,12 @@ const uint64_t pipes[2] = { 0x00000000042LL, 0x0000000043LL };
 const byte W_OFFSET = 8; // walls 
 // DFS variables 
 enum _direction{E, S, W, N};
-byte prev_dir = E;
-byte dir      = E; // start facing East
-byte pos[2]   = {0,0};
+const byte START_DIR = E;  // start facing East
+byte prev_dir        = START_DIR;
+byte dir             = START_DIR;
+const int Y          = 0; // start y 
+const int X          = 0; // start x 
+byte pos[2]          = {X,Y};
 typedef struct {
     byte node_dir; // dir robot was facing when it entered that node 
     bool visited;
@@ -86,9 +90,9 @@ void setup() {
 }
 
 void loop() {
-    l_light = digitalRead(L_LIGHT); // line detected if 0
-    r_light = digitalRead(R_LIGHT);
-    m_light = digitalRead(M_LIGHT);
+    l_light = analogRead(L_LIGHT); // line detected if 0
+    r_light = analogRead(R_LIGHT);
+    m_light = analogRead(M_LIGHT);
 //    while(!start_detected) {
 //        stop_moving();
 //        check_for_start();
@@ -99,7 +103,7 @@ void loop() {
 //        delay(1000);
 //        check_for_hat();
 //    }
-    if (l_light == 0 && r_light == 0) {
+    if (l_light < GREY && r_light < GREY) {
         detect_walls();
     } else {
         LINE_FOLLOWING(100);
@@ -187,7 +191,8 @@ void dfs(int right_wall, int left_wall, int forward_wall) {
         maze[y][x].node_dir = prev_dir;
         maze[y][x].visited = 1;
     }
-    maze[0][0].node_dir = W; // corner case 
+    maze[Y][X].node_dir = (START_DIR + 2) % 4; // corner case
+    maze[Y][X].visited = 1; // start node always starts as visited  
     curr_node = maze[y][x];
 
     int f_x = get_x(x, prev_dir); // pos of node in front of the current node
@@ -205,16 +210,16 @@ void dfs(int right_wall, int left_wall, int forward_wall) {
      
     if (r_block && l_block && f_block) { // 3 sides blocked 
         dir = (curr_node.node_dir + 2) % 4; 
-        //Serial.println("back track");
+        Serial.println("back track");
     } else if (f_block && !r_block) { // front blocked and right not blocked
         dir = right;
-        //Serial.println("turn right");
+        Serial.println("turn right");
     } else if (f_block && !l_block) { //front blocked and left not blocked
         dir = left;  
-        //Serial.println("turn left"); 
+        Serial.println("turn left"); 
     } else {
         dir = prev_dir;
-        //Serial.println("move forward");    
+        Serial.println("move forward");    
     }
     // update pos
     if (dir == N || dir == W) { // going west or north
@@ -287,12 +292,9 @@ void full_right(){
   right.write(R_BACKWARD(100));
   left.write(L_FORWARD(100));
   delay(300);
-  m_light = digitalRead(M_LIGHT);
-    while(m_light == 1){ //  not on white
-      if(m_light == 0) { 
-        break;
-      }
-      m_light = digitalRead(M_LIGHT);
+  r_light = analogRead(R_LIGHT);
+    while(r_light > GREY){ //  not on white
+      r_light = analogRead(R_LIGHT);
     }
 }
 
@@ -301,12 +303,9 @@ void full_180(){
     right.write(R_FORWARD(100));
   left.write(L_BACKWARD(100));
   delay(100);
-  m_light = digitalRead(M_LIGHT);
-    while(m_light == 1){ //  not on white
-      if(m_light == 0) { 
-        break;
-      }
-      m_light = digitalRead(M_LIGHT);
+  l_light = analogRead(R_LIGHT);
+    while(l_light > GREY){ //  not on white
+      l_light = analogRead(L_LIGHT);
     }
 }
 
@@ -317,12 +316,9 @@ void full_left(){
   right.write(R_FORWARD(100));
   left.write(L_BACKWARD(100));
   delay(300);
-  m_light = digitalRead(M_LIGHT);
-    while(m_light == 1){ //  not on white
-      if(m_light == 0) { 
-        break;
-      }
-      m_light = digitalRead(M_LIGHT);
+  l_light = analogRead(L_LIGHT);
+    while(l_light > GREY){ //  not on white
+      l_light = analogRead(L_LIGHT);
     }
 }
 
@@ -346,28 +342,21 @@ int R_BACKWARD(int K){
 }
 
 void LINE_FOLLOWING(int TEMP_SPEED){
-  l_light = digitalRead(L_LIGHT);
-  r_light = digitalRead(R_LIGHT);
-  m_light = digitalRead(M_LIGHT);
+  l_light = analogRead(L_LIGHT);
+  r_light = analogRead(R_LIGHT);
+  m_light = analogRead(M_LIGHT);
   
   //Line Following
-  if(m_light ==0 && l_light == 0){ 
-    left.write(L_FORWARD(K1*TEMP_SPEED/100));
-    right.write(R_FORWARD(100*TEMP_SPEED/100));  
-  }else if(m_light ==0 && r_light == 0){ 
-    right.write(R_FORWARD(K1*TEMP_SPEED/100));
-    left.write(L_FORWARD(100*TEMP_SPEED/100));  
-  } else if(l_light ==0){ 
+    
+  if(l_light < GREY){ 
     left.write(L_FORWARD(K2*TEMP_SPEED/100));
     right.write(R_FORWARD(100*TEMP_SPEED/100));  
-  } else if(r_light ==0){
+  } else if(r_light < GREY){
     right.write(R_FORWARD(K2*TEMP_SPEED/100));
     left.write(L_FORWARD(100*TEMP_SPEED/100));
-  } else if(m_light ==0){
+  } else {
     right.write(R_FORWARD(100*TEMP_SPEED/100));
     left.write(L_FORWARD(100*TEMP_SPEED/100));
-  }else {
-    stop_moving();
   }
 }
 
