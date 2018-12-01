@@ -110,7 +110,7 @@ Licence URI: http://www.os-templates.com/template-terms
     <div class="content">
       <h1><b>Arduino/FPGA Communication</b></h1>
       <p>We wanted to ensure good communication between the FPGA and Arduino while keeping our protocol simple. We originally planned on creating a serial communication protocol, which would result in only having 2 wires between the Arduino and FPGA (A data line and a CLK line). However, upon further inspection, we decided that it would be much easier to use parallel communication with three wires. Each wire represented a bit we were trying to communicate from the FPGA to the Arduino. We only ever need to communicate shape and color to the Arduino. We need two bits for shape because a treasure could be 1 of 3 shapes. We need 1 bit for color because a treasure can only be 1 of 2 colors. This made our communication incredibly simple. The FPGA would just set the wires to be high or low depending on what the camera sees. </p>
-      <img class="imgl borderedbox inspace-5" src="../images/demo/camerabits.PNG" alt="">
+      <img class="imgl borderedbox inspace-5" src="../images/demo/camerabits.PNG" class="center" alt="">
    </div>
   </footer>
 </div>
@@ -119,7 +119,7 @@ Licence URI: http://www.os-templates.com/template-terms
     <div class="content">
       <h1><b>FPGA Camera Read-In</b></h1>
       <p>In this part of the lab, we chose to use RGB 444 to read in bits bit the OC760, as this gave us more accurate image processing. When set to RGB 444, the OV760 sends out the first 8 bits as XXXXBBBB and the next as RRRRGGGG - contrary to what the OV760 data sheet says.  We originally were going to straight downsample the highest bits of each color to fit it to the 8-bit 332 format; however we found it would be more efficient to store all 4 bits of each color which would then be fed to the image processor for more precise color detection. Since we could not use variables in multiple always blocks driven by different conditions, we ended up storing the changes themselves in variables (e.g. VSYNC and lastSYNC) and assigned values based on that. The code snippet below shows under which conditions different variables were updated.</p>
-      <img class="imgl borderedbox inspace-5" src="../images/demo/cameracode2.PNG" alt="">
+      <img class="imgl borderedbox inspace-5" src="../images/demo/cameracode2.PNG" alt="" class="center">
    </div>
   </footer>
 </div>
@@ -138,7 +138,7 @@ Licence URI: http://www.os-templates.com/template-terms
       
       
       </p></pre>
-      <iframe src="https://drive.google.com/file/d/1ZExJPjC79hcNjbYwW5jv7pWNTd3cxDBa/preview" width="640" height="480"></iframe>
+      <iframe src="https://drive.google.com/file/d/1ZExJPjC79hcNjbYwW5jv7pWNTd3cxDBa/preview" width="640" height="480" class="center"></iframe>
    </div>
   </footer>
 </div>
