@@ -4,11 +4,10 @@ Servo left;
 Servo right;
 
 // light sensor constants
-const int GREY       = 600;
 // pin constants
 const int L_LIGHT    = 2;
-const int R_LIGHT    = 3;
-const int M_LIGHT    = 0;
+const int R_LIGHT    = 4;
+const int M_LIGHT    = 3;
 const int LEFT_PIN   = 6;
 const int RIGHT_PIN  = 5;
 const int STOP = 90;
