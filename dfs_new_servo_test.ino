@@ -51,10 +51,10 @@ const uint64_t pipes[2] = { 0x00000000042LL, 0x0000000043LL };
 const byte W_OFFSET = 8; // walls 
 // DFS variables 
 enum _direction{E, S, W, N};
-const byte START_DIR = E;  // start facing East
+const byte START_DIR = S;  // start facing East
 byte prev_dir        = START_DIR;
 byte dir             = START_DIR;
-const int Y          = 0; // start y 
+const int Y          = 1; // start y 
 const int X          = 0; // start x 
 byte pos[2]          = {X,Y};
 typedef struct {
@@ -76,9 +76,9 @@ node maze[9][9] = {
     {zero_node, zero_node, zero_node, zero_node, zero_node, zero_node, zero_node, zero_node, zero_node},
 };
 node curr_node = maze[0][0];
-int red = 7; // W
-int green = 1; // S
-int yellow = 0; // N
+//int red = 7; // right//
+//int green = 1; // forward
+//int yellow = 0; // left
 
 void setup() {
     Serial.begin(9600); // use the serial port
@@ -88,11 +88,13 @@ void setup() {
     admux = ADMUX;
     didro = DIDR0;
     adcsra = ADCSRA;
-    //radio_setup();
+    radio_setup();
     Serial.println("setup");
-    pinMode(red, OUTPUT);
-    pinMode(green, OUTPUT);
-    pinMode(yellow, OUTPUT);
+//    pinMode(red, OUTPUT);
+//    pinMode(green, OUTPUT);
+//    pinMode(yellow, OUTPUT);
+//    digitalWrite(red, LOW);
+//    digitalWrite(green, LOW);
 }
 
 void loop() {
@@ -112,6 +114,7 @@ void loop() {
     if (l_light == 0 && r_light == 0) {
         detect_walls();
         //full_180();
+        //delay(50);
     } else {
         LINE_FOLLOWING(100);
     }
@@ -146,7 +149,7 @@ void detect_walls(){
     walls[right_wall] = r_wall > WALL_THRESHOLD;
     walls[left_wall]  = l_wall > WALL_THRESHOLD;
     walls[prev_dir]   = f_wall > WALL_THRESHOLD;
-    //rf_crap(); // RADIO
+    rf_crap(); // RADIO
     // to gui 
     dfs(walls[right_wall], walls[left_wall], walls[prev_dir]); // r , l, f
     if (dir == prev_dir){ 
@@ -200,8 +203,8 @@ void dfs(int right_wall, int left_wall, int forward_wall) {
         maze[y][x].node_dir = prev_dir;
         maze[y][x].visited = 1;
     }
-    maze[Y][X].node_dir = (START_DIR + 2) % 4; // corner case
-    maze[Y][X].visited = 1; // start node always starts as visited  
+    maze[0][0].node_dir = (START_DIR + 2) % 4; // corner case
+    maze[0][0].visited = 1; // start node always starts as visited  
     curr_node = maze[y][x];
 
     int f_x = get_x(x, prev_dir); // pos of node in front of the current node
@@ -219,33 +222,28 @@ void dfs(int right_wall, int left_wall, int forward_wall) {
      
     if (r_block && l_block && f_block) { // 3 sides blocked 
         dir = (curr_node.node_dir + 2) % 4; 
+//        digitalWrite(red, HIGH);
+//        digitalWrite(green, HIGH);
+//        //digitalWrite(yellow, HIGH);
         Serial.println("back track");
     } else if (f_block && !r_block) { // front blocked and right not blocked
         dir = right;
+//        digitalWrite(red, HIGH);
+//        digitalWrite(green, LOW);
+//        //digitalWrite(yellow, LOW);
         Serial.println("turn right");
     } else if (f_block && !l_block) { //front blocked and left not blocked
         dir = left;  
+//        digitalWrite(red, LOW);
+//        digitalWrite(green, HIGH);
+//        //digitalWrite(yellow, HIGH);
         Serial.println("turn left"); 
     } else {
         dir = prev_dir;
+//        digitalWrite(red, LOW);
+//        digitalWrite(green, LOW);
+//        //digitalWrite(yellow, LOW);    
         Serial.println("move forward");    
-    }
-    if (dir == W){
-        digitalWrite(red, HIGH);
-        digitalWrite(green, LOW);
-        digitalWrite(yellow, LOW);
-    } else if (dir == S){
-        digitalWrite(red, LOW);
-        digitalWrite(green, HIGH);
-        digitalWrite(yellow, LOW);        
-    } else if (dir == N){
-        digitalWrite(red, LOW);
-        digitalWrite(green, LOW);
-        digitalWrite(yellow, HIGH);
-    } else {
-        digitalWrite(red, HIGH);
-        digitalWrite(green, HIGH);
-        digitalWrite(yellow, HIGH);
     }
     // update pos
     if (dir == N || dir == W) { // going west or north
@@ -318,11 +316,9 @@ void full_left(){
   left.write(L_BACKWARD(100));
   delay(1200/BASE_SPEED);
   m_light = digitalRead(M_LIGHT);
-    while(m_light == 1){ //  not on white
-      if(m_light == 0) { 
-        break;
-      }
-      m_light = digitalRead(M_LIGHT);
+    while(m_light == 1 && l_light == 0){ //  not on white
+        m_light = digitalRead(M_LIGHT);
+        l_light = digitalRead(L_LIGHT);
     }
 }
 
@@ -331,14 +327,15 @@ void full_right(){
   delay(300/BASE_SPEED);
   right.write(R_BACKWARD(100));
   left.write(L_FORWARD(100));
-  delay(1200/BASE_SPEED);
+  delay(2000/BASE_SPEED);
   m_light = digitalRead(M_LIGHT);
-    while(m_light == 1){ //  not on white
-      if(m_light == 0) { 
-        break;
-      }
+    while(m_light == 1 && r_light == 0){ //  not on white
       m_light = digitalRead(M_LIGHT);
+      r_light = digitalRead(R_LIGHT);
     }
+//    while(1){
+//        stop_moving();
+//    }
 }
 
 void full_180(){
