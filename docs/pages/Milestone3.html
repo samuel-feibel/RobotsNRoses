@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<!--
+Template Name: Kelaby
+Author: <a href="http://www.os-templates.com/">OS Templates</a>
+Author URI: http://www.os-templates.com/
+Licence: Free to use under our free template licence terms
+Licence URI: http://www.os-templates.com/template-terms
+-->
+<html>
+<head>
+<title>Milestone 3</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link href="../layout/styles/layout.css" rel="stylesheet" type="text/css" media="all">
+</head>
+<body id="top">
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<div class="wrapper row2">
+  <nav id="mainav" class="hoc clear"> 
+    <!-- ################################################################################################ -->
+    <ul class="clear">
+      <li><a href="../index.html">Home</a></li>
+      <li class="active"><a class="drop" href="#">Pages</a>
+        <ul>
+          <li><a href="Labs.html">Labs</a></li>
+          <li class="active"><a href="Milestones.html">Milestones</a></li>
+          <li><a href="Team.html">Team</a></li>
+          <li><a href="Documents.html">Documents</a></li>
+        </ul>
+      </li>
+      <li><a href="#">Gallery</a></li>
+      <li><a href="#">Random Stuff</a></li>
+    </ul>
+    <!-- ################################################################################################ -->
+  </nav>
+</div>
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<div class="bgded overlay" style="background-image:url('./images/demo/backgrounds/logo.PNG');">
+  <div id="breadcrumb" class="hoc clear"> 
+    <!-- ################################################################################################ -->
+    <h6 class="heading">Robots 'N' Roses</h6>
+    <!-- ################################################################################################ -->
+    <!-- ################################################################################################ -->
+  </div>
+</div>
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+  <div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content"> 
+      <!-- ################################################################################################ -->
+      <h1>Goal</h1>
+      <p>Our robot is capable of maze exploration using DFS, BFS, Dijkstra, or A* as well as update the GUI with the correct information. We implemented this using DFS with BFS backtracking rather than right-wall following to navigate the maze because DFS allows us to explore the open areas of the maze unaccessible to right-wall following without the extra complexity of Dijkstra’s or purely BFS algorithms.  </p>
+      </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+   <div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content"> 
+      <!-- ################################################################################################ -->
+      <h1>Materials</h1>
+      <p> <b>   2 Arduino Unos </b> </p>
+      <p> <b>   Radio Chips</b> </p>
+      <p> <b>   1 USB A/B Cable </b> </p>
+      <p> <b>   2 Continuous Rotation Servos </b> </p>
+      <p> <b>   2 Line Sensors </b> </p>
+      <p> <b>   1 Battery Pack </b> </p>
+      <p> <b>   Laser Cut Acrylic and 3D printed Custom Lab Assembly Pieces </b> </p>
+      <p> <b>   Microphone </b> </p>
+      <p> <b>   Breadboard </b> </p>
+      <p> <b>   IR Wall Sensor </b> </p>
+      </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+  <div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content"> 
+      <!-- ################################################################################################ -->
+      <h1>Data Structures</h1>
+      <p>We used a struct node to keep track of each intersection in the maze (Figure 1). Each node contains fields node_dir and visited. Node_dir keeps track of the direction the robot was facing when it first visited that node. Visited is a bool that keeps track of whether the node was visited or not. We keep track of each node in maze, a 9x9 array. Nodes are identified by their indices in the matrix (eg. intersection at y = 1 and x = 2 is the node at maze[1][2]).</p>
+      <img class="imgl borderedbox inspace-5" src="../images/demo/datastructure.PNG" alt="">
+      <p>We first access the current node in maze and check if it has already been visited. If not, we update the node’s node_dir to the direction the robot is facing when it entered the node (prev_dir). Then, we set that node to visited. </p>
+      <img class="imgl borderedbox inspace-5" src="../images/demo/datastructure1.PNG" alt="">
+     </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+</div>
+  <div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content"> 
+      <!-- ################################################################################################ -->
+      <h1>DFS Continued</h1>
+      <p>We then calculate the (x,y) positions of the adjacent nodes and decide if they are blocked (Figure 5). We use helper functions get_x() and get_y() to calculate positions (Figure 4). get_x() and get_y() take in parameters: position in the maze (x or y, respectively) and the direction the robot has to travel to get from the current node to the adjacent node. The functions return the x or y values of the position of the adjacent node. </p>
+      <img class="imgl borderedbox inspace-5" src="../images/demo/dfs1.PNG" alt="">
+    </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+<div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content"> 
+      <!-- ################################################################################################ -->
+      <h1>Still more DFS</h1>
+      <img class="imgl borderedbox inspace-5" src="../images/demo/dfs2.PNG" alt="">
+      <p>To decide whether the path to a adjacent node is blocked, we check if a wall is present. If not, we check if the adjacent node has already been visited (Figure 6). </p>
+      <img class="imgl borderedbox inspace-5" src="../images/demo/dfs3.PNG" alt="">
+      <p>After figuring out which paths are blocked, we update global variable dir to let the robot know its next cardinal direction. If all directions are blocked, we backtrack until we find a node where at least one direction is not blocked (BFS) (Figure 7).</p>
+      <img class="imgl borderedbox inspace-5" src="../images/demo/dfs4.PNG" alt="">
+      <p>After deciding the next direction, the position of the next node to be visited is updated, and the function returns. dfs() is called every time the robot reaches an intersection.</p>
+      </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+<div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content">
+      <h1>Implementation and Testing</h1>
+      <p>We first implemented DFS in the Matlab simulation provided by Team Alpha. After we got our algorithm to work on Matlab, we ported the code to our robot. </p>
+      <iframe src="https://drive.google.com/file/d/1-1vPwWHuQm6waz1pv0QycnlMmjls6gcZ/preview" width="640" height="480"></iframe>
+      <p>This is what the Slash does in the final implementation.</p>
+      <iframe src="https://drive.google.com/file/d/1Km3H3dI7LFNAPwYRtEYF6uwr2r22wedx/preview" width="640" height="480"></iframe>
+    </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+      <!-- ################################################################################################ -->
+    </div>
+    <!-- ################################################################################################ -->
+    <!-- / main body -->
+    <div class="clear"></div>
+  </main>
+</div>
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<div class="wrapper row5">
+  <div id="copyright" class="hoc clear"> 
+    <!-- ################################################################################################ -->
+    <p class="fl_left">Copyright &copy; 2016 - All Rights Reserved - <a href="#">Domain Name</a></p>
+    <p class="fl_right">Template by <a target="_blank" href="http://www.os-templates.com/" title="Free Website Templates">OS Templates</a></p>
+    <!-- ################################################################################################ -->
+  </div>
+</div>
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<a id="backtotop" href="#top"><i class="fa fa-chevron-up"></i></a>
+<!-- JAVASCRIPTS -->
+<script src="../layout/scripts/jquery.min.js"></script>
+<script src="../layout/scripts/jquery.backtotop.js"></script>
+<script src="../layout/scripts/jquery.mobilemenu.js"></script>
+</body>
+</html>
