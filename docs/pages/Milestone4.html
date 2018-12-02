@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<!--
+Template Name: Kelaby
+Author: <a href="http://www.os-templates.com/">OS Templates</a>
+Author URI: http://www.os-templates.com/
+Licence: Free to use under our free template licence terms
+Licence URI: http://www.os-templates.com/template-terms
+-->
+<html>
+<head>
+<title>Milestone 4</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link href="../layout/styles/layout.css" rel="stylesheet" type="text/css" media="all">
+</head>
+<body id="top">
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<div class="wrapper row2">
+  <nav id="mainav" class="hoc clear"> 
+    <!-- ################################################################################################ -->
+    <ul class="clear">
+      <li><a href="../index.html">Home</a></li>
+      <li class="active"><a class="drop" href="#">Pages</a>
+        <ul>
+          <li><a href="Labs.html">Labs</a></li>
+          <li class="active"><a href="Milestones.html">Milestones</a></li>
+          <li><a href="Team.html">Team</a></li>
+          <li><a href="Documents.html">Documents</a></li>
+        </ul>
+      </li>
+      <li><a href="#">Gallery</a></li>
+      <li><a href="#">Random Stuff</a></li>
+    </ul>
+    <!-- ################################################################################################ -->
+  </nav>
+</div>
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<div class="bgded overlay" style="background-image:url('./images/demo/backgrounds/logo.PNG');">
+  <div id="breadcrumb" class="hoc clear"> 
+    <!-- ################################################################################################ -->
+    <h6 class="heading">Robots 'N' Roses</h6>
+    <!-- ################################################################################################ -->
+    <!-- ################################################################################################ -->
+  </div>
+</div>
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+  <div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content"> 
+      <!-- ################################################################################################ -->
+      <h1>Goal</h1>
+      <p>Our robot Slash will be able to tell whether there is a treasure, and be able to tell what color and what shape the treasure is.</p>
+     </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+   <div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content"> 
+      <!-- ################################################################################################ -->
+      <h1>Materials</h1>
+      <p> <b>   1 Arduino Uno </b> </p>
+      <p> <b>   FPGA </b> </p>
+      <p> <b>   1 USB A/B Cable </b> </p>
+      <p> <b>   OV760 Camera </b> </p>
+      </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+  <div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content"> 
+      <!-- ################################################################################################ -->
+      <h1>Further Image Processing</h1>
+      <p>In the previous lab (lab 4) we already began some image filtering using RGB 444. All pixels are converted to either red, blue, or black so that treasure detection is simpler and edges are sharper. To begin shape detection, we count the number of colored pixels in each framer. If there is a certain number of pixels on the screen that have color, that means there is a shape there. Otherwise, there is no shape.</p>
+      <img class="imgl borderedbox inspace-5" src="../images/demo/colorImage.PNG" alt="">
+     </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+</div>
+  <div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content"> 
+      <!-- ################################################################################################ -->
+      <h1>Shape Detection Algorithm</h1>
+      <p>Once we have established there is a shape, we used edge detection to determine what that shape is. To filter out noise on the edges of the image, we disregarded the first and last 20 x-pixels and the first and last 10 y-pixels. We then added a variable to determine if a colored pixel was the first colored pixel we had seen in that row. For debugging purposes, we colored the edge we detected in green as in the picture below.</p>
+      <img class="imgl borderedbox inspace-5" src="../images/demo/edgeDetection.PNG" alt="">
+    </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+<div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content"> 
+      <!-- ################################################################################################ -->
+      <h1>Still more Shape Detection</h1>
+      <p>We then divided the middle of the screen into 4 horizontal rows. If it was the pixel read in was the first colored pixel we saw, we added the X value of the pixel to a running sum of the corresponding section. For example, if a pixel’s coordinate (X,Y) was (48, 30) we would add it to the sum of the top section. </p>
+      <img class="imgl borderedbox inspace-5" src="../images/demo/section.PNG" alt="">
+      <p>In order to determine which shape it is, we tallied the X coordinates of the edges in each section. </p>
+      <img class="imgl borderedbox inspace-5" src="../images/demo/shapecode.PNG" alt="">
+      <p>If the sum of X coordinates of the edge for the top half is in total greater than the sum of the coordinates of the edges for the bottom half, then the shape is a triangle (i.e. the edge of the top half is further in than the edge of the bottom half). If the sum of the X coordinates of the edge in the top and bottom is greater than the sum of the X coordinates in the the middle, then the shape is a diamond (i.e. the edges in the top quarter and the edges in the bottom quarter are further in than the edge pixels in the middle). Since squares are difficult to detect (i.e. straight line edge) because precision tends be low, we let that be the last “else” statement in the shape detection block. If there is a shape, first check if it is a triangle, if not then check if it is a diamond, if it is not a triangle or diamond it must be a square. The sums for each section are reset to zero at the beginning of the next frame (i.e. when the pixel with coordinates zero, zero come across). </p>
+     </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+<div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content">
+      <h1>Final Implementation</h1>
+      <p>When we implement this circuit on Slash, to prevent blurred, inaccurate images, we will only trigger the shape detection when Slash comes to a full stop at an intersection. Then we only set “shapeDetected” to true if we have detected a shape for 7 out of 10 consecutive frames and record the shape back to the main computer.</p>
+      <iframe src="STUFF" width="640" height="480"></iframe>
+      <p>Note: For some peculiar reason, our camera mysteriously stopped working over Thanksgiving break. We lost all the red values and despite reverting to old working code, switching out everything, using another group’s code and circuit, we could not get it to work. My only explanation is that the cable we were using to upload data to the FPGA is broken or the 2 wires sending data between the Arduino and the camera was broken (since we used the same wires the whole time, maybe we shouldn’t have). We used another group’s camera circuit in exchange for our shape detection algorithm. We are currently unsure if we can actually put a camera circuit on our robot.</p>
+    </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+      <!-- ################################################################################################ -->
+    </div>
+    <!-- ################################################################################################ -->
+    <!-- / main body -->
+    <div class="clear"></div>
+  </main>
+</div>
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<div class="wrapper row5">
+  <div id="copyright" class="hoc clear"> 
+    <!-- ################################################################################################ -->
+    <p class="fl_left">Copyright &copy; 2016 - All Rights Reserved - <a href="#">Domain Name</a></p>
+    <p class="fl_right">Template by <a target="_blank" href="http://www.os-templates.com/" title="Free Website Templates">OS Templates</a></p>
+    <!-- ################################################################################################ -->
+  </div>
+</div>
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<a id="backtotop" href="#top"><i class="fa fa-chevron-up"></i></a>
+<!-- JAVASCRIPTS -->
+<script src="../layout/scripts/jquery.min.js"></script>
+<script src="../layout/scripts/jquery.backtotop.js"></script>
+<script src="../layout/scripts/jquery.mobilemenu.js"></script>
+</body>
+</html>
