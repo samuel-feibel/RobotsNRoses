@@ -106,10 +106,19 @@ Licence URI: http://www.os-templates.com/template-terms
   <footer id="footer" class="hoc clear"> 
     <div class="content"> 
       <!-- ################################################################################################ -->
-      <h1>Still more Shape Detection</h1>
+      <h1>Code</h1>
       <p>We then divided the middle of the screen into 4 horizontal rows. If it was the pixel read in was the first colored pixel we saw, we added the X value of the pixel to a running sum of the corresponding section. For example, if a pixel’s coordinate (X,Y) was (48, 30) we would add it to the sum of the top section. </p>
       <img class="imgl borderedbox inspace-5" src="../images/demo/section.PNG" alt="">
       <p>In order to determine which shape it is, we tallied the X coordinates of the edges in each section. </p>
+      <pre> 
+      
+      
+      
+      
+      
+      
+      
+      </pre>
       <img class="imgl borderedbox inspace-5" src="../images/demo/shapecode.PNG" alt="">
       <p>If the sum of X coordinates of the edge for the top half is in total greater than the sum of the coordinates of the edges for the bottom half, then the shape is a triangle (i.e. the edge of the top half is further in than the edge of the bottom half). If the sum of the X coordinates of the edge in the top and bottom is greater than the sum of the X coordinates in the the middle, then the shape is a diamond (i.e. the edges in the top quarter and the edges in the bottom quarter are further in than the edge pixels in the middle). Since squares are difficult to detect (i.e. straight line edge) because precision tends be low, we let that be the last “else” statement in the shape detection block. If there is a shape, first check if it is a triangle, if not then check if it is a diamond, if it is not a triangle or diamond it must be a square. The sums for each section are reset to zero at the beginning of the next frame (i.e. when the pixel with coordinates zero, zero come across). </p>
      </div>
