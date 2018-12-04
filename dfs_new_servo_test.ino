@@ -72,6 +72,7 @@ byte pos[2]          = {X,Y};
 typedef struct {
     byte node_dir; // dir robot was facing when it entered that node 
     bool visited;
+    //byte walls; // WALL MEM
 } node;
 node zero_node = {0, 0};
 node maze[9][9] = {
@@ -243,6 +244,7 @@ void dfs(int right_wall, int left_wall, int forward_wall) {
     if (!maze[y][x].visited) { // if curr_node not visited 
         maze[y][x].node_dir = prev_dir;
         maze[y][x].visited = 1;
+        //maze[y][x].walls = right_wall << 2 | left_wall << 1| forward_wall; // WALL MEM
     }
     maze[0][0].node_dir = (START_DIR + 2) % 4; // corner case
     maze[0][0].visited = 1; // start node always starts as visited  
@@ -256,6 +258,14 @@ void dfs(int right_wall, int left_wall, int forward_wall) {
     
     int l_x = get_x(x, left); // pos of node to the left of the current node
     int l_y = get_y(y, left);
+
+//    bool rw = curr_node.walls >> 2; // WALL MEM
+//    bool lw = (curr_node.walls >> 1) & 1;
+//    bool fw = curr_node.walls & one;
+//
+//    bool r_block = (rw) ? 1 : maze[r_y][r_x].visited; // WALL MEM
+//    bool l_block = (lw) ? 1 : maze[l_y][l_x].visited;
+//    bool f_block = (fw) ? 1 : maze[f_y][f_x].visited;
     
     bool r_block = (right_wall)   ? 1 : maze[r_y][r_x].visited;
     bool l_block = (left_wall)    ? 1 : maze[l_y][l_x].visited;
@@ -601,6 +611,7 @@ void check_for_start() {
         walls[left_wall]  = l_wall > L_WALL_THRESHOLD;
         walls[prev_dir]   = f_wall > F_WALL_THRESHOLD;
         walls[(prev_dir + 2) % 4] = 1; // assumes wall behind
+        //maze[0][0].walls = walls[right_wall] << 2 | walls[left_wall] << 1| walls[prev_dir]; // WALL MEM
         pos[0] = 0;
         pos[1] = 0;
         rf_crap();
