@@ -54,17 +54,27 @@ void loop(void) {
             walls[E]    = (got_time & (1 << (W_OFFSET + E))) >> (W_OFFSET + E);
             walls[N]    = (got_time & (1 << (W_OFFSET + N))) >> (W_OFFSET + N);
             walls[S]    = (got_time & (1 << (W_OFFSET + S))) >> (W_OFFSET + S);
-            
+            // Camera
+            //ALLOWED_VALUES['tshape'] = ['square', 'triangle', 'diamond', 'none']
+//            int shape0  = (got_time & (1 << (W_OFFSET + 4))) >> (W_OFFSET + 4);
+//            int shape1  = (got_time & (1 << (W_OFFSET + 5))) >> (W_OFFSET + 5);
+            String treasure_type = "none";
+//            if (shape0 == 1 && shape1 == 0){
+//                treasure_type = "triangle";
+//            } else if (shape0 == 0 && shape1 == 1){
+//                treasure_type = "diamond";
+//            } else if (shape0 == 1 && shape1 == 1){
+//                treasure_type = "square";
+//            }
             _print = String(y) + ","
                    + String(x) + "," 
                    + "west="  + bool_str(walls[W]) + ","
                    + "north=" + bool_str(walls[N]) + ","
                    + "east="  + bool_str(walls[E]) + ","
                    + "south=" + bool_str(walls[S]);
+                  // + "tshape=" + treasure_type;
             //Serial.println(got_time, BIN);
             Serial.println(_print);
-
-            
         }
     }
 }
