@@ -5,25 +5,24 @@
 #include <SPI.h>
 #include "nRF24L01.h"
 #include "RF24.h"
+// Camera
+int color;
+int shape0;
+int shape1;
+// Camera done
 //servos
 Servo left; 
 Servo right;
-// IR hat detector 
-const int GREY = 600;
-bool hat_detected = false;
-// microphone 
-bool start_detected = false;
-byte count660 = 0;
-// pin constants
-const int HAT_SENSOR = A0; // TODO same as L_WALL
 // pin constants new servos
-const int L_LIGHT    = 2;
-const int R_LIGHT    = 4;
-const int M_LIGHT    = 3;
-const int LEFT_PIN   = 6;
-const int RIGHT_PIN  = 5;
+int l_light_prev;
+int r_light_prev;
+const byte L_LIGHT    = 2;
+const byte R_LIGHT    = 4;
+const byte M_LIGHT    = 3;
+const byte LEFT_PIN   = 6;
+const byte RIGHT_PIN  = 5;
 const int STOP = 90;
-const int BASE_SPEED = 5;
+const byte BASE_SPEED = 6; // between 5 and 10, havent tried pass 7
 const int K1 = 50;
 const int K2 = 30;
 int l_light = 0;
@@ -31,18 +30,31 @@ int r_light = 0;
 int m_light = 0;
 int wait = 1000;
 int turn_wait = 900;
-int l_light_prev;
-int r_light_prev; // new servos
 //wall constants
 const int R_WALL = A1;
-const int L_WALL = A0;
+const int L_WALL = A2;
 const int F_WALL = A5;
-const int WALL_THRESHOLD = 120;
+//const int WALL_THRESHOLD = 500; //TODO
+const int R_WALL_THRESHOLD = 150;
+const int L_WALL_THRESHOLD = 160;
+const int F_WALL_THRESHOLD = 130;
+
 //adc default 
 unsigned int timsko = 0;
 unsigned int admux = 0;
 unsigned int didro = 0;
 unsigned int adcsra = 0;
+int count660 = 0;
+int emergency_button_thresh= 900;
+int button_val;
+bool start_detected= false;
+bool hat_detected=false;
+bool button_press=false;
+const int EMERGENCY_BUTTON = A3;
+const int IR_AUDIO_SENSOR = A4;
+//IR 1, AUDIO 0
+const int MUX_CONTROL_PIN = 7;
+
 //radio variables
 byte walls[4] = {0, 0, 0, 0};
 RF24 radio(9,10);
@@ -61,8 +73,6 @@ typedef struct {
     byte node_dir; // dir robot was facing when it entered that node 
     bool visited;
 } node;
-//const byte ROW = 2; //5; 
-//const byte COL = 3; //4;
 node zero_node = {0, 0};
 node maze[9][9] = {
     {zero_node, zero_node, zero_node, zero_node, zero_node, zero_node, zero_node, zero_node, zero_node},
@@ -76,9 +86,6 @@ node maze[9][9] = {
     {zero_node, zero_node, zero_node, zero_node, zero_node, zero_node, zero_node, zero_node, zero_node},
 };
 node curr_node = maze[0][0];
-//int red = 7; // right//
-//int green = 1; // forward
-//int yellow = 0; // left
 
 void setup() {
     Serial.begin(9600); // use the serial port
@@ -88,33 +95,44 @@ void setup() {
     admux = ADMUX;
     didro = DIDR0;
     adcsra = ADCSRA;
+    pinMode(MUX_CONTROL_PIN, OUTPUT); // mux setup
+    digitalWrite(MUX_CONTROL_PIN, LOW); // start with audio
     radio_setup();
     Serial.println("setup");
-//    pinMode(red, OUTPUT);
-//    pinMode(green, OUTPUT);
-//    pinMode(yellow, OUTPUT);
-//    digitalWrite(red, LOW);
-//    digitalWrite(green, LOW);
+    while(!start_detected) {
+        stop_moving();
+        check_for_start();
+        Serial.println("checking for start");
+        Serial.println(start_detected);
+    }
+    Serial.println("running");
+    digitalWrite(MUX_CONTROL_PIN, HIGH); // start with audio
 }
 
 void loop() {
+//    while(1){
+//        stop_moving();    
+//    }
     l_light = digitalRead(L_LIGHT);
     r_light = digitalRead(R_LIGHT);
     m_light = digitalRead(M_LIGHT);
 //    while(!start_detected) {
 //        stop_moving();
 //        check_for_start();
-//        Serial.println("Started");
+//        Serial.println("checking for start");
 //    }
-//    while(hat_detected) { //Slash has detected another robot
-//        stop_moving();
-//        delay(1000);
-//        check_for_hat();
-//    }
+//    Serial.println("running");
+//    digitalWrite(MUX_CONTROL_PIN, HIGH); // start with audio
+    check_for_hat();
+    while(hat_detected) { //Slash has detected another robot
+        stop_moving();
+        //Serial.println("found hat");
+        //full_180();
+        check_for_hat();
+        //Serial.println("loop check for hat");
+    }
     if (l_light == 0 && r_light == 0) {
         detect_walls();
-        //full_180();
-        //delay(50);
     } else {
         LINE_FOLLOWING(100);
     }
@@ -125,9 +143,27 @@ void detect_walls(){
     prev_dir = dir;
     byte right_wall = (prev_dir + 1) % 4;
     byte left_wall  = (prev_dir + 3) % 4;
-    int r_wall = analogRead(R_WALL);
-    int l_wall = analogRead(L_WALL);
-    int f_wall = analogRead(F_WALL);
+    int r_wall = 0;
+    int l_wall = 0;
+    int f_wall = 0;
+    for (int i = 0; i < 10; i++){
+        r_wall = r_wall + analogRead(R_WALL);
+        f_wall = f_wall + analogRead(F_WALL);
+        l_wall = l_wall + analogRead(L_WALL);
+        //Serial.println(f_wall);
+    }
+
+    r_wall = r_wall/10;
+    f_wall = f_wall/10;
+    l_wall = l_wall/10;
+    //Serial.println("avg ");
+    //Serial.println(f_wall);
+    //while(1){
+    //    stop_moving();
+    //}
+//    int r_wall = analogRead(R_WALL);
+//    int l_wall = analogRead(L_WALL);
+//    int f_wall = analogRead(F_WALL);
     walls[0] = 0; // reset wall array
     walls[1] = 0;
     walls[2] = 0;
@@ -146,12 +182,17 @@ void detect_walls(){
                    + "south=" + String(walls[S]);
     Serial.print (_print);
     Serial.println (_print2);
-    walls[right_wall] = r_wall > WALL_THRESHOLD;
-    walls[left_wall]  = l_wall > WALL_THRESHOLD;
-    walls[prev_dir]   = f_wall > WALL_THRESHOLD;
+    walls[right_wall] = r_wall > R_WALL_THRESHOLD;
+    walls[left_wall]  = l_wall > L_WALL_THRESHOLD;
+    walls[prev_dir]   = f_wall > F_WALL_THRESHOLD;
+//    if (walls[right_wall]){
+//        detect_treasure(); // TODO 
+//    }
     rf_crap(); // RADIO
     // to gui 
     dfs(walls[right_wall], walls[left_wall], walls[prev_dir]); // r , l, f
+    //Serial.println(walls[left_wall]);
+
     if (dir == prev_dir){ 
         Serial.println("Forward");
         move_forward();
@@ -219,6 +260,13 @@ void dfs(int right_wall, int left_wall, int forward_wall) {
     bool r_block = (right_wall)   ? 1 : maze[r_y][r_x].visited;
     bool l_block = (left_wall)    ? 1 : maze[l_y][l_x].visited;
     bool f_block = (forward_wall) ? 1 : maze[f_y][f_x].visited;
+
+    r_block = (r_x < 0 || r_x > 8 || r_y < 0 || r_y > 8) ? 1 : r_block;
+    l_block = (l_x < 0 || l_x > 8 || l_y < 0 || l_y > 8) ? 1 : l_block;
+    f_block = (f_x < 0 || f_x > 8 || f_y < 0 || f_y > 8) ? 1 : f_block;
+
+    check_for_hat(); // check for other robots 
+    f_block = (hat_detected) ? 1 : f_block; // if hat detected, front is blocked
      
     if (r_block && l_block && f_block) { // 3 sides blocked 
         dir = (curr_node.node_dir + 2) % 4; 
@@ -253,8 +301,15 @@ void dfs(int right_wall, int left_wall, int forward_wall) {
     }
 }
 
-void detect_treasure() {
-  //to be written
+void detect_treasure() { // Camera
+    shape0 = digitalRead(8);
+    shape1 = analogRead(A0);
+    //Serial.println(shape1);
+    if (shape1 < 500){
+        shape1 = 0;
+    } else {
+        shape1 = 1;
+    }
 }
 
 void rf_crap() { //radio
@@ -265,6 +320,9 @@ void rf_crap() { //radio
     temp |= (walls[N] << (W_OFFSET + N));
     temp |= (walls[S] << (W_OFFSET + S));
     temp |= (walls[E] << (W_OFFSET + E)); //TODO the rest of the bits
+    // Camera
+//    temp |= shape0 << (W_OFFSET + 4);
+//    temp |= shape1 << (W_OFFSET + 5);
     radio.stopListening();
     bool ok = radio.write( &temp, sizeof(unsigned long) );
     radio.startListening();
@@ -285,7 +343,38 @@ void radio_setup() {
 }
 
 void check_for_hat() {
-   
+    TIMSK0 = 0; // turn off timer0 for lower jitter
+    ADMUX = 0x44; // use adc0
+    DIDR0 = 0x04; // turn off the digital input for adc0
+    ADCSRA = 0xe5; // set the adc to free running mode
+    cli();  // UDRE interrupt slows this way down on arduino1.0
+    for (int i = 0 ; i < 512 ; i += 2) { // save 256 samples
+        while(!(ADCSRA & 0x10)); // wait for adc to be ready
+        ADCSRA = 0xf5; // restart adc
+        byte m = ADCL; // fetch adc data
+        byte j = ADCH;
+        int k = (j << 8) | m; // form into an int
+        k -= 0x0200; // form into a signed int
+        k <<= 6; // form into a 16b signed int
+        fft_input[i] = k; // put real data into even bins
+        fft_input[i+1] = 0; // set odd bins to 0
+    }
+    fft_window(); // window the data for better frequency response
+    fft_reorder(); // reorder the data before doing the ff
+    fft_run(); // process the data in the fft
+    fft_mag_log(); // take the output of the fft
+    sei();
+    if(fft_log_out[40] > 100 || fft_log_out[41] > 100 || fft_log_out[42] > 100 || fft_log_out[43] > 100 || fft_log_out[44] > 100 || fft_log_out[45] > 100 || fft_log_out[46] > 100){
+        hat_detected = true;
+        Serial.println("Hat detected!!");
+    } else {
+        hat_detected = false;
+        //Serial.println("No hat detected!!");
+    }
+    TIMSK0 = timsko;
+    ADMUX = admux;
+    DIDR0 = didro;
+    ADCSRA = adcsra;    
 }
 
 // new servos
@@ -306,49 +395,94 @@ void turn_left(){
 
 void stop_moving(){
   left.write(STOP);
-  right.write(STOP);  
+  right.write(STOP); 
+  delay(50); 
 }
 
 void full_left(){
-  move_forward();
-  delay(300/BASE_SPEED);
-  right.write(R_FORWARD(100));
-  left.write(L_BACKWARD(100));
-  delay(1200/BASE_SPEED);
-  m_light = digitalRead(M_LIGHT);
-    while(m_light == 1 && l_light == 0){ //  not on white
+    //move_forward();
+    //delay(500);
+    right.write(R_FORWARD(100));
+    left.write(L_BACKWARD(0));
+    delay(500);
+    m_light = digitalRead(M_LIGHT);
+    while(m_light == 1){ //  not on white
         m_light = digitalRead(M_LIGHT);
-        l_light = digitalRead(L_LIGHT);
     }
-}
-
-void full_right(){
-  move_forward();
-  delay(300/BASE_SPEED);
-  right.write(R_BACKWARD(100));
-  left.write(L_FORWARD(100));
-  delay(2000/BASE_SPEED);
-  m_light = digitalRead(M_LIGHT);
-    while(m_light == 1 && r_light == 0){ //  not on white
-      m_light = digitalRead(M_LIGHT);
-      r_light = digitalRead(R_LIGHT);
-    }
-//    while(1){
-//        stop_moving();
+//    move_forward();
+//    delay(500/BASE_SPEED);
+//    right.write(R_FORWARD(100));
+//    left.write(L_BACKWARD(100));
+//    delay(800/BASE_SPEED);
+//    m_light = digitalRead(M_LIGHT);
+//    while(m_light == 1){ //  not on white
+//        m_light = digitalRead(M_LIGHT);
+//    }
+//    right.write(R_FORWARD(100));
+//    delay(80);
+////    move_forward()
+////    delay(140);
+////    right.write(R_FORWARD(100));
+////    left.write(L_BACKWARD(100));
+////    delay(200); //800/BASE_SPEED
+//    m_light = digitalRead(M_LIGHT);
+//    while(m_light == 1){ //  not on white
+//        m_light = digitalRead(M_LIGHT);
 //    }
 }
 
-void full_180(){
-    move_forward();
-    delay(200);
-    full_left();
-    right.write(R_FORWARD(100));
-  left.write(L_BACKWARD(100));
-  delay(500);
-  l_light = digitalRead(L_LIGHT);
-    while(l_light){ //  not on white
-      l_light = digitalRead(L_LIGHT);
+void full_right(){
+    //move_forward();
+    //delay(500);
+    right.write(R_BACKWARD(0));
+    left.write(L_FORWARD(100));
+    delay(500);
+    m_light = digitalRead(M_LIGHT);
+    while(m_light == 1){ //  not on white
+        m_light = digitalRead(M_LIGHT);
     }
+//    left.write(L_FORWARD(100));
+//    delay(80);
+////    move_forward();
+////    delay(140);
+////    right.write(R_BACKWARD(100));
+////    left.write(L_FORWARD(100));
+////    delay(200); //800/BASE_SPEED
+////    m_light = digitalRead(M_LIGHT);
+////    while(m_light == 1){ //  not on white
+////        m_light = digitalRead(M_LIGHT);
+////    }
+//    m_light = digitalRead(M_LIGHT);
+//    while(m_light == 1){ //  not on white
+//        m_light = digitalRead(M_LIGHT);
+//    }
+
+}
+
+void full_180(){
+    //full_right();
+    right.write(R_BACKWARD(100));
+    left.write(L_BACKWARD(100));
+    delay(100);
+    //move_forward();
+    //delay(300/BASE_SPEED);
+    right.write(R_FORWARD(100));
+    left.write(L_BACKWARD(100));
+    delay(200);
+    m_light = digitalRead(M_LIGHT);
+    while(m_light == 1){ //  not on white
+        m_light = digitalRead(M_LIGHT);
+    }
+//    full_left();
+//    move_forward();
+//    delay(80);
+//    right.write(R_FORWARD(100));
+//    left.write(L_BACKWARD(100));
+//    delay(100);
+//    m_light = digitalRead(M_LIGHT);
+//    while(m_light == 1){ //  not on white
+//        m_light = digitalRead(M_LIGHT);
+//    }
 }
 
 int R_FORWARD(int K){
@@ -370,31 +504,107 @@ int R_BACKWARD(int K){
 }
 
 void LINE_FOLLOWING(int TEMP_SPEED){
-  l_light = digitalRead(L_LIGHT);
-  r_light = digitalRead(R_LIGHT);
-  m_light = digitalRead(M_LIGHT);
-  
-  //Line Following
-  if(m_light ==0 && l_light == 0){ 
-    left.write(L_FORWARD(K1*TEMP_SPEED/100));
-    right.write(R_FORWARD(100*TEMP_SPEED/100));  
-  }else if(m_light ==0 && r_light == 0){ 
-    right.write(R_FORWARD(K1*TEMP_SPEED/100));
-    left.write(L_FORWARD(100*TEMP_SPEED/100));  
-  } else if(l_light ==0){ 
-    left.write(L_FORWARD(K2*TEMP_SPEED/100));
-    right.write(R_FORWARD(100*TEMP_SPEED/100));  
-  } else if(r_light ==0){
-    right.write(R_FORWARD(K2*TEMP_SPEED/100));
-    left.write(L_FORWARD(100*TEMP_SPEED/100));
-  } else if(m_light ==0){
-    right.write(R_FORWARD(100*TEMP_SPEED/100));
-    left.write(L_FORWARD(100*TEMP_SPEED/100));
-  }else {
-    stop_moving();
-  }
+    l_light = digitalRead(L_LIGHT); // 0 means sees line!!!
+    r_light = digitalRead(R_LIGHT);
+    m_light = digitalRead(M_LIGHT);
+    Serial.print("l  ");
+    Serial.print(l_light);
+    Serial.print("  r  ");
+    Serial.print(r_light);
+    Serial.print("  m  ");
+    Serial.println(m_light);
+    
+    
+    //Line Following
+    if(m_light ==0 && l_light == 0){ 
+        left.write(L_FORWARD(K1*TEMP_SPEED/100));
+        right.write(R_FORWARD(100*TEMP_SPEED/100));  
+    } else if(m_light ==0 && r_light == 0){ 
+        right.write(R_FORWARD(K1*TEMP_SPEED/100));
+        left.write(L_FORWARD(100*TEMP_SPEED/100));  
+    } else if(l_light ==0){ 
+        left.write(L_FORWARD(K2*TEMP_SPEED/100));
+        right.write(R_FORWARD(100*TEMP_SPEED/100));  
+    } else if(r_light ==0){
+        right.write(R_FORWARD(K2*TEMP_SPEED/100));
+        left.write(L_FORWARD(100*TEMP_SPEED/100));
+    } else if(m_light ==0){
+        right.write(R_FORWARD(100*TEMP_SPEED/100));
+        left.write(L_FORWARD(100*TEMP_SPEED/100));
+    } else {
+        if (!l_light_prev){
+            turn_left();
+            while(m_light){
+                m_light = digitalRead(M_LIGHT);
+            }   
+        } else if(!r_light_prev){
+            turn_right();
+            while(m_light) {
+                m_light = digitalRead(M_LIGHT);
+            }
+        } else{
+            move_forward(); // change to move forward!!!
+        }
+    }
+    l_light_prev = l_light;
+    r_light_prev = r_light;
 }
 
 void check_for_start() {
-      
+    button_val= analogRead(EMERGENCY_BUTTON);
+    //Serial.println(button_val);
+    TIMSK0 = 0; // turn off timer0 for lower jitter
+    ADCSRA = 0xe5; // set the adc to free running mode
+    ADMUX = 0x44; // use adc4
+    DIDR0 = 0x04; // turn off the digital input for adc4
+    cli();  // UDRE interrupt slows this way down on arduino1.0
+    for (int i = 0 ; i < 512 ; i += 2) { // save 256 samples
+        while(!(ADCSRA & 0x10)); // wait for adc to be ready
+        ADCSRA = 0xf5; // restart adc
+        byte m = ADCL; // fetch adc data
+        byte j = ADCH;
+        int k = (j << 8) | m; // form into an int
+        k -= 0x0200; // form into a signed int
+        k <<= 6; // form into a 16b signed int
+        fft_input[i] = k; // put real data into even bins
+        fft_input[i+1] = 0; // set odd bins to 0
+    }
+    fft_window(); // window the data for better frequency response
+    fft_reorder(); // reorder the data before doing the fft
+    fft_run(); // process the data in the fft
+    fft_mag_log(); // take the output of the fft
+    sei();
+    if (fft_log_out[4] > 185 ){
+        count660++;
+    } else {
+        count660 = 0;
+    }
+    if (count660 >= 10 || button_val > emergency_button_thresh){
+        Serial.println("detected start!!!!");
+        start_detected = true;
+        Serial.println(start_detected);
+        digitalWrite(MUX_CONTROL_PIN, HIGH); // change to IR
+    }
+    TIMSK0 = timsko;
+    ADMUX = admux;
+    DIDR0 = didro;
+    ADCSRA = adcsra;
+    // send maze[0][0]to gui
+    if (start_detected) {
+        prev_dir        = START_DIR;
+        byte right_wall = (prev_dir + 1) % 4;
+        byte left_wall  = (prev_dir + 3) % 4;
+        int r_wall = analogRead(R_WALL);
+        int l_wall = analogRead(L_WALL);
+        int f_wall = analogRead(F_WALL);
+        walls[right_wall] = r_wall > R_WALL_THRESHOLD;
+        walls[left_wall]  = l_wall > L_WALL_THRESHOLD;
+        walls[prev_dir]   = f_wall > F_WALL_THRESHOLD;
+        walls[(prev_dir + 2) % 4] = 1; // assumes wall behind
+        pos[0] = 0;
+        pos[1] = 0;
+        rf_crap();
+        pos[0] = X;
+        pos[1] = Y; 
+    }    
 }
