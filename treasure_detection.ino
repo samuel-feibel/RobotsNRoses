@@ -81,19 +81,25 @@ void loop(){
 }
 
 void detect_treasure() {
-  color = digitalRead(4);
-  shape0 = digitalRead(3);
-  shape1 = digitalRead(2);
-  //Serial.print(shape1);
-  //Serial.print(shape0);
+  shape0 = digitalRead(8);
+  shape1 = analogRead(A0);
+  //Serial.println(shape1);
+  if (shape1 < 500){
+    shape1 = 0;
+  } else {
+    shape1 = 1;
+  }
+  Serial.print(shape1);
+  Serial.println(shape0);
+  //Serial.println(shape0);
   //Serial.println(color);
-
-  if (color == 0 && shape1 == 0 && shape0 ==0) {
+  
+  if (shape1 == 0 && shape0 ==0) {
     treasure_type = "No Treasure";
   }
 
   else {
-    if (color == 0){/
+    if (1){
       treasure_type = "Blue ";
     } else {
       treasure_type = "Red ";
@@ -112,7 +118,7 @@ void detect_treasure() {
     }
   }
 
-  Serial.println(treasure_type);
+  //Serial.println(treasure_type);
 }
  
 
