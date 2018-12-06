@@ -1,1 +1,188 @@
+<!DOCTYPE html>
+<!--
+Template Name: Kelaby
+Author: <a href="http://www.os-templates.com/">OS Templates</a>
+Author URI: http://www.os-templates.com/
+Licence: Free to use under our free template licence terms
+Licence URI: http://www.os-templates.com/template-terms
+-->
+<html>
+<head>
+<title>Robot Design</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link href="../layout/styles/layout.css" rel="stylesheet" type="text/css" media="all">
+</head>
+<body id="top">
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<div class="wrapper row2">
+  <nav id="mainav" class="hoc clear"> 
+    <!-- ################################################################################################ -->
+    <ul class="clear">
+      <li><a href="../index.html">Home</a></li>
+      <li class="active"><a class="drop" href="#">Pages</a>
+        <ul>
+          <li><a href="Labs.html">Labs</a></li>
+          <li class="active"><a href="Milestones.html">Milestones</a></li>
+          <li><a href="Team.html">Team</a></li>
+          <li><a href="Documents.html">Documents</a></li>
+        </ul>
+      </li>
+      <li><a href="#">Gallery</a></li>
+      <li><a href="#">Random Stuff</a></li>
+    </ul>
+    <!-- ################################################################################################ -->
+  </nav>
+</div>
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<div class="bgded overlay" style="background-image:url('./images/demo/backgrounds/logo.PNG');">
+  <div id="breadcrumb" class="hoc clear"> 
+    <!-- ################################################################################################ -->
+    <h6 class="heading">Robots 'N' Roses</h6>
+    <!-- ################################################################################################ -->
+    <!-- ################################################################################################ -->
+  </div>
+</div>
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+  <div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content"> 
+      <!-- ################################################################################################ -->
+      <h1>ECE 3400 Team 24: Robot’s N Roses’ competition robot, Slash, had a robust, clean and competent design, capable of completing every element of the ECE 3400 2018 competition.</h1>
+      <p align = "center"> <img src="../images/demo/slash.PNG" alt=""> </p> 
+    </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+   <div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content"> 
+      <!-- ################################################################################################ -->
+      <h1>Hardware</h1>
+      <p align = "center"> <img src="../images/demo/slashtop.PNG" alt=""> </p> 
+      </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+  <div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content"> 
+      <!-- ################################################################################################ -->
+      <h1>FRAME</h1>
+      <p>Our robot was built on a custom laser cut two level frame. The first level provides space for a central wiring breadboard, integrating all sensors and motors that operate on 5 Volt lines. Behind this was a space for a secondary breadboard, integrating all signals that operate on a 3.3V line. Above these is a secondary platform, slightly smaller than the first in order to allow easier access to the main platform. This top platform was built for all components that either needed to be at a high height or needed to be accessed constantly. These were the main arduino, the audio/IR circuit and sensors, and the FPGA. We laser cut each piece to be visually satisfying, choosing an all black base for all frame components. In addition, we added through holes designed for each set of wires coming from the different sides of the robot to assist in organization. </p>
+      <img class="imgl borderedbox inspace-5" src="../images/demo/slashpic1.PNG" alt="">
+      <img class="imgr borderedbox inspace-5" src="../images/demo/slashpic2.PNG" alt="">
+     </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+</div>
+  <div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content"> 
+      <!-- ################################################################################################ -->
+      <h1>WALL SENSORS</h1>
+      <p>We mounted 3 short distance analog distance sensors on the front and sides of Slash. The mounting components were 3D printed so we chose colors to maintain a symmetric design.</p>
+      </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+<div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content"> 
+      <!-- ################################################################################################ -->
+      <h1>LINE SENSORS</h1>
+      <p>We won 3 Analog/Digital line sensors in 3400 lecture competition. These were advantageous because they allowed manual hardware thresholding on their digital pins through a potentiometer mounted on each. This made tuning and testing much easier because the LEDs on each outputted if they were on a white or grey surface, allowing for tuning on any surface we tested on and removing the need to reset code every time the line sensors had a problem. We spent a lot of time choosing a mounting height but settled on about 7.5mm from the ground because it was able to consistently read lines correctly even on dirty surfaces.</p>
+      <img class="imgl borderedbox inspace-5" src="../images/demo/linesensor1.PNG" alt="">
+      <img class="imgr borderedbox inspace-5" src="../images/demo/linesensor2.PNG" alt="">
+      <p>We mounted all three sensors next to each other in the front for a number of reasons. The first was that by mounting them farther forward, we were able to turn more consistently because the sensors were away from intersections for a longer time. In addition, by making the distance between each sensor slightly less than the width of a line, we allowed the possibility for two sensors to be triggered simultaneously. This allowed 6 different cases for the robot’s position: Left, Left-Mid, Mid, Mid-Right, Right, None. For the Left-Mid and Mid-Right instead of turning one servo off and just using the other to get back on track as other teams did, we slowed down one in order to slowly get back on the line, creating a much smoother line following pattern. This was especially useful with the integration of our faster servos.</p>
+      </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+<div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content">
+      <h1>Servos</h1>
+      <p>We switched out the normal Parallax continuous rotation servos with High Speed Parallax continuous rotation servos and mounted them in the front quarter of our chassis. We initially wanted to increase our robot’s speed, recognizing that a faster robot would be able to map more of the map and score better. We considered motors but decided that with our limited time, the simplest and best solution would be to use higher speed versions of wervos we already had. They were 3 times faster and only required a new power source.</p>
+       <p align = "center"> <img src="../images/demo/servo.PNG" alt=""> </p> 
+    </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+<div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content">
+      <h1>Power</h1>
+      <p>We had 3 seperate power requirements. The FPGA and Arduino required 5V, the Servos required 6-8V, and the IR hat required 9V. The 5V source we had available fed from a USB port so we decided to connect each device to a separate source. The servos said that they required 6-8V but we tried using a 9V battery so that we didn’t have to regulate. This ended working so we wired each servo to a battery in order to supply each with maximum power. We also wanted to make the IR hat module in order to test so we attached that to its own 9V battery. </p>
+      <p align = "center"> <img src="../images/demo/slashpower.PNG" alt=""> </p> 
+      <p>Since a low center of mass allowed for increased reliability and limited tipping at higher speeds, we attached both 5V voltage sources to the bottom of the robot, as close to the ground as possible. We connected the 9V batteries on the bottom of the robot directly behind each servo for easy access and replacement. Since the IR hat was on top, we mounted that to directly opposite the FPGA, close to the hat without sticking out. </p>
+    </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+<div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content">
+      <h1>Camera</h1>
+      <p>We mounted our camera near the front of our robot, pointing to the right, exactly 4.25” off of the ground. We mounted at the front so that the camera was directly above the line sensors. This meant that when the robot stopped at the intersection, the camera would be aligned with the line and facing a treasure if there was one there. The treasures were also 4.25” off of the ground so the they would be fully in frame. We faced right because our DFS program prioritized right turns. 
 
+        We connected all wiring from the camera to a breadboard mounted at the back of the robot. This helped section off all camera components with FPGA and 3.3V breadboard both at the back. All connections and software on the FPGA and camera communicated properly with the arduino indicating proper wiring. 
+        </p>
+     <p align = "center"> <img src="../images/demo/slashcamera.PNG" alt=""> </p> 
+    </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+<div class="wrapper row4">
+  <footer id="footer" class="hoc clear"> 
+    <div class="content">
+      <h1>Connections and Wiring</h1>
+      <p>We prioritized adaptable systems so we made as little permanent as possible. Components were velcroed and screwed at the beginning of the process and taped near the end. However, all components were stable. Our robot could be shaken heavily and operate properly. This was advantageous with the faster system.</p>
+    </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
+      <!-- ################################################################################################ -->
+    </div>
+    <!-- ################################################################################################ -->
+    <!-- / main body -->
+    <div class="clear"></div>
+  </main>
+</div>
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<div class="wrapper row5">
+  <div id="copyright" class="hoc clear"> 
+    <!-- ################################################################################################ -->
+    <p class="fl_left">Copyright &copy; 2016 - All Rights Reserved - <a href="#">Domain Name</a></p>
+    <p class="fl_right">Template by <a target="_blank" href="http://www.os-templates.com/" title="Free Website Templates">OS Templates</a></p>
+    <!-- ################################################################################################ -->
+  </div>
+</div>
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<a id="backtotop" href="#top"><i class="fa fa-chevron-up"></i></a>
+<!-- JAVASCRIPTS -->
+<script src="../layout/scripts/jquery.min.js"></script>
+<script src="../layout/scripts/jquery.backtotop.js"></script>
+<script src="../layout/scripts/jquery.mobilemenu.js"></script>
+</body>
+</html>
