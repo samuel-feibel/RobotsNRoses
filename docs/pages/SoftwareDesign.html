@@ -8,7 +8,7 @@ Licence URI: http://www.os-templates.com/template-terms
 -->
 <html>
 <head>
-<title>Robot Design</title>
+<title>Software Design</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <link href="../layout/styles/layout.css" rel="stylesheet" type="text/css" media="all">
@@ -88,7 +88,7 @@ We were about to add a 1 byte field, walls, to our node struct to store the loca
       <!-- ################################################################################################ -->
       <h1>DFS Logic</h1>
       <p>We added logic to detect if a node position is out of range while deciding which direction to turn. A direction is not blocked if there is no wall, the adjacent node in that direction has not been visited, and the node is not out of bounds (Figure 12). </p>
-      p align = "center"> <img src="../images/demo/sfd1.png" alt=""> </p>  
+      <p align = "center"> <img src="../images/demo/sfd1.png" alt=""> </p>  
     <p>After deciding which paths are blocked, we decide which cardinal direction Slash will be facing and the next node he will visit (Figure 13).</p>
     <p align = "center"> <img src="../images/demo/sfd2.png" alt=""> </p> 
     </div>
@@ -100,8 +100,8 @@ We were about to add a 1 byte field, walls, to our node struct to store the loca
     <div class="content"> 
       <!-- ################################################################################################ -->
       <h1>Treasure Detection (Arduino Side)</h1>
-      <p>We read the values sent to pins 8 and A0, and wrote them to variables shape0 and shape1 respectively (Figure 2). If shape1 exceeds a threshold value, we set shape1 to 1. These values are sent through the radio. The base station then reads shape0 and shape1 to determine the treasure’s shape (Figure 3).</p>
       <img class="imgl borderedbox inspace-5" src="../images/demo/sfd3.PNG" alt=""> 
+      <p>We read the values sent to pins 8 and A0, and wrote them to variables shape0 and shape1 respectively (Figure 2). If shape1 exceeds a threshold value, we set shape1 to 1. These values are sent through the radio. The base station then reads shape0 and shape1 to determine the treasure’s shape (Figure 3).</p>
       <img class="imgr borderedbox inspace-5" src="../images/demo/sfd4.PNG" alt="">
       </div>
     <!-- ################################################################################################ -->
