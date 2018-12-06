@@ -128,7 +128,7 @@ address, article, aside, figcaption, figure, footer, header, main, nav, section{
 .inspace-80{padding:80px;}
 
 .image-blurred-edge {
-    background-image: url('../images/demo/slashtop.PNG');
+    background-image: url('../../images/demo/slashtop.PNG');
     style="visibility;hidden;"
     /* you need to match the shadow color to your background or image border for the desired effect*/
     box-shadow: 0 0 8px 8px white inset;
